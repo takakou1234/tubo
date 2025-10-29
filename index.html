@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ツボマップ｜症状別表示＋ツボ解説</title>
+<title>ツボマップ｜症状別で該当ツボだけ表示</title>
 <style>
-  :root { --accent:#0f766e; --lite:#eef6f6; }
+  :root { --accent:#0f766e; }
   *{box-sizing:border-box}
   body{margin:0;background:#fafafa;color:#222;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
   header{background:#444;color:#fff;padding:.9rem 1rem;font-weight:600}
@@ -17,25 +17,18 @@
   select{flex:1;padding:.6rem .7rem;border:1px solid #d7d7d7;border-radius:10px;background:#fff;font-size:.95rem}
   button{padding:.55rem .8rem;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
   button.ghost{background:#fff;color:var(--accent)}
-  .canvas{padding:10px}
   object{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #e6e6e6;background:#fff}
-  /* SVG制御クラス */
-  ._acupoint-text._hide{opacity:0;pointer-events:none}
-  ._acupoint-dot._hide{opacity:0;pointer-events:none}
-  ._acupoint-dot._show{opacity:1;filter:drop-shadow(0 0 2px rgba(15,118,110,.6))}
-  /* 解説カード */
-  .notes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px;max-height:420px;overflow:auto;border-top:1px dashed #eee;padding-top:10px}
-  .note{border:1px solid #e9f0ef;background:#fff;border-radius:12px;padding:10px}
-  .note h3{margin:.1rem 0 .3rem;font-size:1rem;color:#0f4d4a}
-  .note p{margin:.2rem 0 .2rem;font-size:.92rem;color:#333;line-height:1.5}
-  .hint{color:#666;font-size:.85rem;margin-top:8px}
+
+  /* === SVG制御クラス（完全に消す） === */
+  ._hide { display:none !important; }
+  ._show { display:inline !important; filter:drop-shadow(0 0 2px rgba(15,118,110,.6)); }
+  /* 本体（体の輪郭やランドマーク）は常に表示：触らない */
 </style>
 </head>
 <body>
-<header>ツボマップ（症状で絞り込み & ツボ解説）</header>
+<header>ツボマップ（症状で該当ツボだけ表示）</header>
 
 <div class="wrap">
-  <!-- 左：操作と解説 -->
   <aside class="panel">
     <h2>症状から選ぶ</h2>
     <div class="row">
@@ -51,25 +44,20 @@
         <option>足関節痛</option>
       </select>
       <button id="apply">表示</button>
-      <button class="ghost" id="clear">解除</button>
+      <button class="ghost" id="clear">全表示</button>
     </div>
-    <div class="hint">選ぶと、該当するツボ<strong>だけ</strong>が図上に表示され、下に解説が出ます。</div>
 
     <h2 style="margin-top:14px;">選択中のツボ解説</h2>
-    <div id="notes" class="notes"><div class="hint">症状を選ぶとここに表示されます。</div></div>
-    <p class="hint">※ 学習・デモ用の一般的な説明です。医療行為はクリニックでご相談ください。</p>
+    <div id="notes"><div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div></div>
   </aside>
 
-  <!-- 右：SVG -->
-  <main class="panel canvas">
+  <main class="panel">
     <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" aria-label="ツボマップ"></object>
   </main>
 </div>
 
 <script>
-/* =============================
-   症状→推奨ツボ
-   ============================= */
+/* ===== 症状→ツボ対応 ===== */
 const symptomMap = {
   "肩こり": ["肩井","風池","天柱","肩髃","曲池","合谷"],
   "頭痛": ["百会","印堂","風池","太衝","合谷"],
@@ -81,65 +69,65 @@ const symptomMap = {
   "足関節痛": ["解谿","崑崙","太谿","丘墟","申脈"]
 };
 
-/* =============================
-   ツボ解説（簡潔版）
-   ============================= */
+/* ===== ツボ解説（簡潔） ===== */
 const tsuboInfo = {
-  "肩井": {loc:"肩の中央、僧帽筋の最も盛り上がる所。", eff:"肩こり・首肩の緊張、頭重感。", how:"指腹で90秒ほどやさしく圧をかけ、ゆっくり3回。"},
-  "風池": {loc:"後頭骨下、胸鎖乳突筋と僧帽筋の間のくぼみ。", eff:"頭痛・頚部のこわばり・眼精疲労。", how:"親指で後頭部に向かってやさしく押圧。"},
-  "天柱": {loc:"後頭部の髪の生え際、僧帽筋の外側。", eff:"首こり・後頭部痛。", how:"頭を前に倒して押しやすい角度で30秒×3。"},
-  "肩髃": {loc:"肩関節の前外側、腕を水平でくぼむ点。", eff:"肩関節周囲の痛み・可動域。", how:"円を描くようにほぐす。"},
-  "曲池": {loc:"肘を曲げてできるしわの外端。", eff:"肘痛・肩こり補助、自律神経調整。", how:"押圧または軽い回旋でほぐす。"},
-  "合谷": {loc:"手背の親指と人差指の骨が交わる所のくぼみ。", eff:"頭痛・歯痛・肩こり・鼻症状。", how:"心地よい圧で30〜60秒。妊娠後期は長圧を避ける。"},
-  "百会": {loc:"両耳尖を結んだ線の正中、頭頂部。", eff:"頭痛・めまい・不眠・自律神経。", how:"深呼吸しながら軽圧。"},
-  "印堂": {loc:"眉間中央。", eff:"鼻閉・頭痛・ストレス。", how:"やさしく点圧。"},
-  "太衝": {loc:"足背、第一・二中足骨間のくぼみ。", eff:"頭痛・PMS・ストレス。", how:"指腹で30秒×3。"},
-  "頰車": {loc:"下顎角の少し前、歯を噛みしめて盛り上がる点。", eff:"顎関節痛・食いしばり。", how:"噛筋を緩めるようにじんわり。"},
-  "下関": {loc:"頬骨弓の下、口を開閉して動くくぼみ。", eff:"顎関節痛・耳周りの違和感。", how:"口を軽く開けた状態で優しく。"},
-  "太渓": {loc:"内くるぶしとアキレス腱の間のくぼみ。", eff:"顎痛補助・腰痛・冷え。", how:"温め＋軽圧。"},
-  "迎香": {loc:"小鼻の両外側のくぼみ。", eff:"鼻閉・花粉症。", how:"呼気に合わせてやや上外に向けて軽圧。"},
-  "上星": {loc:"前髪の生え際正中から指1本分上。", eff:"鼻閉・頭重。", how:"正中に沿って軽圧。"},
-  "内関": {loc:"手首しわ中央から肘側へ指3本分、2本の腱の間。", eff:"逆流性食道炎・吐き気・動悸。", how:"やや持続的に押す。"},
-  "中脘": {loc:"臍と胸骨剣状突起の中点。", eff:"胃もたれ・逆流。", how:"食後すぐは避け、やさしく円揉。"},
-  "膻中": {loc:"左右乳頭を結ぶ線の正中。", eff:"胸のつかえ・自律神経。", how:"浅く広めに手掌で包む。"},
-  "足三里": {loc:"膝下外側、脛骨稜から指1本外・下へ3本。", eff:"胃腸・全身調整・足疲労。", how:"ほどよい痛気持ち圧で。"},
-  "三陰交": {loc:"内くるぶし上、脛骨内縁を指4本分。", eff:"PMS・冷え・むくみ。", how:"心地よく温め＋指圧。妊娠後期は長圧を避ける。"},
-  "関元": {loc:"臍下指3本。", eff:"下腹部の冷え・生理痛。", how:"カイロ等で温め＋軽圧。"},
-  "気海": {loc:"臍下指1.5本。", eff:"疲労・冷え。", how:"腹式呼吸と併用。"},
-  "環跳": {loc:"股関節外側、立位で体重をかけるとくぼむ点。", eff:"坐骨神経痛・股関節痛。", how:"お尻の筋膜リリースと併用。"},
-  "殷門": {loc:"大腿後面中央、坐骨結節と膝窩の中点。", eff:"坐骨神経痛。", how:"フォームローラー等で優しく。"},
-  "委中": {loc:"膝裏しわの中央。", eff:"腰背部痛・坐骨神経痛。", how:"膝を少し曲げ押圧。"},
-  "承山": {loc:"下腿後面、腓腹筋のV字下端。", eff:"ふくらはぎ張り・坐骨神経痛。", how:"つま先立ち→リリースと併用。"},
-  "承扶": {loc:"殿部、坐骨結節のすぐ下。", eff:"坐骨神経痛。", how:"長圧は避け、短時間で。"},
-  "陽陵泉": {loc:"腓骨頭の前下方のくぼみ。", eff:"膝外側痛・坐骨神経痛補助。", how:"外側ラインをほぐすように。"},
-  "解谿": {loc:"足首前面、伸筋腱の間のくぼみ。", eff:"足関節痛・捻挫後の違和感。", how:"可動域内で軽圧。"},
-  "崑崙": {loc:"外くるぶしとアキレス腱の間のくぼみ。", eff:"足関節痛・腰痛。", how:"短時間の指圧。"},
-  "丘墟": {loc:"外くるぶし前下方のくぼみ。", eff:"足関節の捻挫後ケア。", how:"軽い円揉。"},
-  "申脈": {loc:"外くるぶしの真下。", eff:"足首安定・背部のこわばり。", how:"骨に沿ってやさしく。"}
+  "肩井": {loc:"肩の中央、僧帽筋の盛り上がる所。", eff:"肩こり・頭重。", how:"指腹で90秒×1〜2回。"},
+  "風池": {loc:"後頭骨下、胸鎖乳突筋と僧帽筋の間。", eff:"頭痛・首こり・眼精疲労。", how:"親指で後頭側に軽圧。"},
+  "天柱": {loc:"後頭部の生え際、僧帽筋外側。", eff:"後頭部痛・首こり。", how:"前屈して30秒×3。"},
+  "肩髃": {loc:"肩関節前外側、水平外転でくぼむ点。", eff:"肩痛・可動域。", how:"円揉みでほぐす。"},
+  "曲池": {loc:"肘を曲げたしわ外端。", eff:"肘痛・肩こり補助。", how:"押圧30秒×3。"},
+  "合谷": {loc:"手背の第1-2中手骨の合流点。", eff:"頭痛・歯痛・鼻症状。", how:"痛気持ち程度で30〜60秒。"},
+  "百会": {loc:"頭頂、両耳尖連結線の正中。", eff:"頭痛・自律神経。", how:"深呼吸と合わせ軽圧。"},
+  "印堂": {loc:"眉間中央。", eff:"鼻閉・ストレス。", how:"やさしく点圧。"},
+  "太衝": {loc:"足背、第1-2中足骨間。", eff:"頭痛・PMS・イライラ。", how:"30秒×3。"},
+  "頰車": {loc:"下顎角の前、咬筋が張る所。", eff:"顎関節痛・食いしばり。", how:"噛筋を緩めるように。"},
+  "下関": {loc:"頬骨弓の下、口開閉で動くくぼみ。", eff:"顎関節痛・耳周囲。", how:"口を軽く開けて軽圧。"},
+  "太渓": {loc:"内果とアキレス腱の間。", eff:"腰痛・冷え。", how:"温め＋軽圧。"},
+  "迎香": {loc:"小鼻外側のくぼみ。", eff:"鼻閉・花粉症。", how:"呼気に合わせ上外へ軽圧。"},
+  "上星": {loc:"前髪生え際正中から指1本上。", eff:"鼻閉・頭重。", how:"正中に沿って点圧。"},
+  "内関": {loc:"手首中央から肘側へ指3本、腱の間。", eff:"逆流・吐き気。", how:"持続的に軽圧。"},
+  "中脘": {loc:"臍と剣状突起の中点。", eff:"胃もたれ・逆流。", how:"食後すぐは避け円揉。"},
+  "膻中": {loc:"左右乳頭の中点正中。", eff:"胸のつかえ。", how:"掌で包むように。"},
+  "足三里": {loc:"膝下外、脛骨稜から1本外・下へ3本。", eff:"胃腸・全身。", how:"やや強めに。"},
+  "三陰交": {loc:"内果上で脛骨内縁の指4本。", eff:"PMS・冷え。", how:"温め＋軽圧。"},
+  "関元": {loc:"臍下3寸。", eff:"下腹の冷え・生理痛。", how:"保温＋軽圧。"},
+  "気海": {loc:"臍下1.5寸。", eff:"疲労・冷え。", how:"腹式呼吸併用。"},
+  "環跳": {loc:"股関節外側、荷重でくぼむ点。", eff:"坐骨神経痛。", how:"殿筋リリース併用。"},
+  "殷門": {loc:"大腿後面中央。", eff:"坐骨神経痛。", how:"フォームローラーで優しく。"},
+  "委中": {loc:"膝窩中央。", eff:"腰背部痛。", how:"膝軽屈で押圧。"},
+  "承山": {loc:"腓腹筋V字の下端。", eff:"ふくらはぎ張り。", how:"つま先立ち→リリース併用。"},
+  "承扶": {loc:"坐骨結節の下。", eff:"坐骨神経痛。", how:"短時間で。"},
+  "陽陵泉": {loc:"腓骨頭前下のくぼみ。", eff:"膝外側痛。", how:"外側ラインをほぐす。"},
+  "解谿": {loc:"足首前面、伸筋腱の間。", eff:"足関節痛。", how:"可動域内で軽圧。"},
+  "崑崙": {loc:"外果とアキレス腱の間。", eff:"足関節痛・腰痛。", how:"短時間の指圧。"},
+  "丘墟": {loc:"外果前下のくぼみ。", eff:"捻挫後ケア。", how:"軽い円揉。"},
+  "申脈": {loc:"外果直下。", eff:"足首安定。", how:"骨沿いにやさしく。"}
 };
 
-/* ====== 内部状態 ====== */
+/* ===== 状態 & 参照 ===== */
 const svgObj = document.getElementById('svgObj');
 const symSelect = document.getElementById('symSelect');
 const notesEl  = document.getElementById('notes');
-let svgDoc=null;
-let nameToDot = new Map();     // ツボ名 -> circle
-let nameToTexts = new Map();   // ツボ名 -> [text,text,...]
 
-/* ====== SVGロード後：ツボ名と黒点を自動対応付け ====== */
+let svgDoc=null;
+let nameToDot = new Map();      // ツボ名 -> circle
+let nameToTexts = new Map();    // ツボ名 -> [text,...]
+let nameToAux = new Map();      // ツボ名 -> [line,...] 近接の短い補助線
+
+/* ===== SVGロード：ツボ名⇔黒点⇔補助線 を自動対応付け ===== */
 svgObj.addEventListener('load', () => {
   svgDoc = svgObj.contentDocument;
   if (!svgDoc) return;
 
   const circles = Array.from(svgDoc.querySelectorAll('circle'));
   const texts   = Array.from(svgDoc.querySelectorAll('text'));
+  const lines   = Array.from(svgDoc.querySelectorAll('line'));
 
-  // textごとに最も近いcircleを割当て（ツボ名テキストのみ対象）
+  // textごとに最も近いcircleを代表点として対応付け
   texts.forEach(t => {
     const name = (t.textContent || "").trim().replace(/\s+/g,"");
     if (!name) return;
 
-    // 位置
     const b = t.getBBox();
     const tx = b.x + b.width/2, ty = b.y + b.height/2;
 
@@ -151,69 +139,98 @@ svgObj.addEventListener('load', () => {
       if(d2<bestD){bestD=d2;best=c;}
     });
     if(best){
-      best.classList.add('_acupoint-dot');
       if(!nameToDot.has(name)) nameToDot.set(name,best);
-      // テキスト管理
       if(!nameToTexts.has(name)) nameToTexts.set(name,[]);
       nameToTexts.get(name).push(t);
-      t.classList.add('_acupoint-text');
     }
   });
 
-  // 初期：全ツボ表示（＝非表示解除）
+  // 近接の“短い” line を補助線として紐付け（ラベルの引き出し線等）
+  // しきい値：距離 <= 40px かつ 長さ <= 60px（適宜調整可）
+  const dist = (x1,y1,x2,y2)=>Math.hypot(x1-x2,y1-y2);
+  const LEN = (ln)=>Math.hypot((+ln.getAttribute('x1')||0)-(+ln.getAttribute('x2')||0),
+                               (+ln.getAttribute('y1')||0)-(+ln.getAttribute('y2')||0));
+
+  nameToDot.forEach((dot, name)=>{
+    const cx = +dot.getAttribute('cx')||0;
+    const cy = +dot.getAttribute('cy')||0;
+    const near = lines.filter(ln=>{
+      const x1=+ln.getAttribute('x1')||0, y1=+ln.getAttribute('y1')||0;
+      const x2=+ln.getAttribute('x2')||0, y2=+ln.getAttribute('y2')||0;
+      const l = LEN(ln);
+      const d = Math.min(dist(cx,cy,x1,y1), dist(cx,cy,x2,y2));
+      return l<=60 && d<=40; // “短くて近い”線
+    });
+    if(near.length){
+      nameToAux.set(name, near);
+    }
+  });
+
+  // 初期：全ツボ表示（※「全表示」＝非選択状態）
   showOnly([]);
+  renderNotes([]);
 });
 
-/* ====== 表示制御：指定ツボ“だけ”表示 ====== */
+/* ===== 表示制御：指定ツボ“だけ”残す ===== */
 function showOnly(names){
   if(!svgDoc) return;
   const want = new Set(names);
 
-  // 1) いったん全ツボを隠す（黒点と“ツボ名テキスト”のみ対象）
-  nameToDot.forEach(el => { el.classList.add('_hide'); el.classList.remove('_show'); });
+  // まず全ツボ（黒点・テキスト・補助線）を隠す
+  nameToDot.forEach(el => el.classList.add('_hide'));
   nameToTexts.forEach(arr => arr.forEach(t => t.classList.add('_hide')));
+  nameToAux.forEach(arr => arr.forEach(l => l.classList.add('_hide')));
 
-  // 2) 指定ツボだけ表示
+  if(!names.length){
+    // “全表示”状態：すべて見せる
+    nameToDot.forEach(el => { el.classList.remove('_hide'); el.classList.remove('_show'); });
+    nameToTexts.forEach(arr => arr.forEach(t => t.classList.remove('_hide')));
+    nameToAux.forEach(arr => arr.forEach(l => l.classList.remove('_hide')));
+    return;
+  }
+
+  // 対象のみ表示＋強調
   want.forEach(n=>{
     const dot = nameToDot.get(n);
     if(dot){ dot.classList.remove('_hide'); dot.classList.add('_show'); }
-    const texts = nameToTexts.get(n)||[];
-    texts.forEach(t => t.classList.remove('_hide'));
+    (nameToTexts.get(n)||[]).forEach(t=> t.classList.remove('_hide'));
+    (nameToAux.get(n)||[]).forEach(l=> l.classList.remove('_hide'));
   });
 }
 
-/* ====== 解説生成 ====== */
+/* ===== 解説生成 ===== */
 function renderNotes(names){
   if(!names.length){
-    notesEl.innerHTML = '<div class="hint">症状を選ぶとここに表示されます。</div>';
+    notesEl.innerHTML = '<div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div>';
     return;
   }
   notesEl.innerHTML = "";
   names.forEach(n=>{
-    const info = tsuboInfo[n];
-    const card = document.createElement('div');
-    card.className = 'note';
-    const h = document.createElement('h3'); h.textContent = n;
-    const p1 = document.createElement('p'); p1.innerHTML = `<strong>位置：</strong>${info?.loc||"（調整中）"}`;
-    const p2 = document.createElement('p'); p2.innerHTML = `<strong>効能：</strong>${info?.eff||"（調整中）"}`;
-    const p3 = document.createElement('p'); p3.innerHTML = `<strong>押し方：</strong>${info?.how||"（調整中）"}`;
-    card.append(h,p1,p2,p3);
-    notesEl.appendChild(card);
+    const info = tsuboInfo[n]||{};
+    const wrap = document.createElement('div');
+    wrap.style.border = '1px solid #e9f0ef';
+    wrap.style.borderRadius = '12px';
+    wrap.style.padding = '10px';
+    wrap.style.marginBottom = '8px';
+    const h = document.createElement('h3'); h.textContent = n; h.style.margin='0 0 4px'; h.style.color='#0f4d4a'; h.style.fontSize='1rem';
+    const p1 = document.createElement('p'); p1.innerHTML = `<strong>位置：</strong>${info.loc||"（調整中）"}`; p1.style.margin='4px 0';
+    const p2 = document.createElement('p'); p2.innerHTML = `<strong>効能：</strong>${info.eff||"（調整中）"}`; p2.style.margin='4px 0';
+    const p3 = document.createElement('p'); p3.innerHTML = `<strong>押し方：</strong>${info.how||"（調整中）"}`; p3.style.margin='4px 0';
+    wrap.append(h,p1,p2,p3);
+    notesEl.appendChild(wrap);
   });
 }
 
-/* ====== イベント ====== */
+/* ===== イベント ===== */
 document.getElementById('apply').onclick = () => {
   const key = symSelect.value;
-  if(!key){ showOnly([]); renderNotes([]); return; }
-  const names = symptomMap[key] || [];
+  const names = key ? (symptomMap[key]||[]) : [];
   showOnly(names);
   renderNotes(names);
 };
-
 document.getElementById('clear').onclick = () => {
   symSelect.value = "";
-  showOnly([]);       // ＝全ツボ表示（隠す解除）
+  showOnly([]);     // ＝全ツボ表示
   renderNotes([]);
 };
 </script>
