@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ツボマップ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツボマップ（前面図）</title>
   <style>
-    body{margin:0;background:#fafafa;color:#222;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
-    header{padding:12px 16px;background:#444;color:#fff;text-align:center}
-    main{max-width:1200px;margin:24px auto;padding:0 16px}
-    .card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-    .hint{font-size:.9rem;color:#666;margin:8px 0 0}
-    img,object{width:100%;height:auto;display:block}
+    body {
+      margin: 0;
+      background: #fafafa;
+      font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background: #444;
+      color: white;
+      padding: 1rem;
+      font-size: 1.5rem;
+    }
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    object, img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    footer {
+      margin: 2rem;
+      color: #777;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
-  <header>ツボマップ（GitHub Pages）</header>
+  <header>ツボマップ（前面図）</header>
   <main>
-    <div class="card">
-      <!-- まずは一番確実な IMG 表示 -->
-      <img src="tsubo_map_front_medical_web.svg" alt="ツボマップ（SVG）"
-           onerror="document.getElementById('fallback').style.display='block'">
-
-      <!-- OBJECT 版（インタラクティブSVGにする時はこちらを使います） -->
-      <object id="svgObject" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" style="margin-top:12px;"></object>
-
-      <p id="fallback" class="hint" style="display:none">
-        SVGの読み込みに失敗しました。ファイル名・場所を確認してください：
-        <code>tsubo_map_front_medical_web.svg</code>
-      </p>
-
-      <p class="hint">更新が反映されない場合は <strong>Ctrl + Shift + R</strong> で再読み込み。</p>
-    </div>
+    <object type="image/svg+xml" data="tsubo_map_front_medical_web.svg" id="tsuboMap"></object>
+    <p>※ 読み込みに失敗した場合はページを再読み込みしてください。</p>
   </main>
+  <footer>© 2025 ツボマップ練習用ページ（GitHub Pages）</footer>
 </body>
 </html>
