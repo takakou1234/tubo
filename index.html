@@ -3,52 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ツボマップ｜症状で即切替</title>
+<title>ツボマップ（症状別フィルタ）</title>
 <style>
-  :root { --accent:#0f766e; }
-  *{box-sizing:border-box}
   body{margin:0;background:#fafafa;color:#222;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
-  header{background:#444;color:#fff;padding:.9rem 1rem;font-weight:600}
-  .wrap{max-width:1200px;margin:18px auto;padding:0 14px;display:grid;grid-template-columns:320px 1fr;gap:16px}
+  header{background:#444;color:#fff;padding:1rem;font-weight:600}
+  .wrap{max-width:1200px;margin:1.5rem auto;padding:0 1rem;display:grid;grid-template-columns:300px 1fr;gap:16px}
   @media(max-width:960px){.wrap{grid-template-columns:1fr}}
-  .panel{background:#fff;border:1px solid #e6e6e6;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-  .panel h2{margin:.2rem 0 .8rem;font-size:1.05rem}
-  select{width:100%;padding:.6rem .7rem;border:1px solid #d7d7d7;border-radius:10px;background:#fff;font-size:.95rem;margin-bottom:10px}
-  .btn-clear{padding:.5rem .8rem;border-radius:10px;border:1px solid var(--accent);background:#fff;color:var(--accent);cursor:pointer;font-weight:600}
-  object{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #e6e6e6;background:#fff}
-  ._hide{display:none !important}
-  ._show{display:inline !important;filter:drop-shadow(0 0 2px rgba(15,118,110,.6))}
-  .notes{display:grid;gap:10px;margin-top:10px;max-height:420px;overflow:auto;border-top:1px dashed #eee;padding-top:10px}
-  .note{border:1px solid #e9f0ef;background:#fff;border-radius:12px;padding:10px}
-  .note h3{margin:.1rem 0 .3rem;font-size:1rem;color:#0f4d4a}
-  .note p{margin:.2rem 0 .2rem;font-size:.92rem;line-height:1.5}
+  .panel{background:#fff;border:1px solid #ddd;border-radius:12px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  select,button{font-size:1rem;padding:.6rem .8rem;border-radius:10px;border:1px solid #aaa}
+  button{background:#0f766e;color:#fff;border-color:#0f766e;cursor:pointer}
+  button.ghost{background:#fff;color:#0f766e}
+  object{width:100%;height:auto;border:1px solid #ddd;border-radius:10px}
 </style>
 </head>
 <body>
-<header>ツボマップ（症状選択で即反映）</header>
-
+<header>ツボマップ（GitHub Pages｜症状別フィルタ）</header>
 <div class="wrap">
   <aside class="panel">
-    <h2>症状から選ぶ</h2>
-    <select id="symSelect" aria-label="症状を選択">
-      <option value="">— 症状を選択 —（全表示）</option>
-      <option>肩こり</option><option>頭痛</option><option>顎関節痛</option>
-      <option>鼻閉・花粉症</option><option>逆流性食道炎</option>
-      <option>PMS</option><option>坐骨神経痛</option><option>足関節痛</option>
+    <h3>症状から選ぶ</h3>
+    <select id="symSelect">
+      <option value="">— 症状を選択 —</option>
+      <option value="肩こり">肩こり</option>
+      <option value="頭痛">頭痛</option>
+      <option value="顎関節痛">顎関節痛</option>
+      <option value="鼻閉・花粉症">鼻閉・花粉症</option>
+      <option value="逆流性食道炎">逆流性食道炎</option>
+      <option value="PMS">PMS</option>
+      <option value="坐骨神経痛">坐骨神経痛</option>
+      <option value="足関節痛">足関節痛</option>
     </select>
-    <button class="btn-clear" id="clear">全表示に戻す</button>
-
-    <h2 style="margin-top:14px;">選択中のツボ解説</h2>
-    <div id="notes" class="notes"><div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div></div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button id="apply">表示</button>
+      <button class="ghost" id="clear">解除</button>
+    </div>
   </aside>
-
   <main class="panel">
-    <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" aria-label="ツボマップ"></object>
+    <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg"></object>
   </main>
 </div>
 
 <script>
-/* 症状→ツボ */
 const symptomMap = {
   "肩こり": ["肩井","風池","天柱","肩髃","曲池","合谷"],
   "頭痛": ["百会","印堂","風池","太衝","合谷"],
@@ -60,139 +54,51 @@ const symptomMap = {
   "足関節痛": ["解谿","崑崙","太谿","丘墟","申脈"]
 };
 
-/* 解説（簡潔） */
-const info = {
-  "肩井":{loc:"肩中央の僧帽筋上",eff:"肩こり・頭重",how:"指腹で90秒×1-2回"},
-  "風池":{loc:"後頭骨下のくぼみ",eff:"頭痛・眼精疲労",how:"後頭側へ軽圧"},
-  "天柱":{loc:"後頭部の生え際外側",eff:"首こり",how:"前屈し30秒×3"},
-  "肩髃":{loc:"肩前外側のくぼみ",eff:"肩痛",how:"円揉み"},
-  "曲池":{loc:"肘しわ外端",eff:"肘痛・肩こり補助",how:"押圧30秒×3"},
-  "合谷":{loc:"第1-2中手骨の合流点",eff:"頭痛・歯痛・鼻症状",how:"30-60秒 軽痛気持ち"},
-  "百会":{loc:"頭頂正中",eff:"頭痛・自律神経",how:"軽圧＋深呼吸"},
-  "印堂":{loc:"眉間中央",eff:"鼻閉・ストレス",how:"点圧"},
-  "太衝":{loc:"第1-2中足骨間",eff:"頭痛・PMS",how:"30秒×3"},
-  "頰車":{loc:"下顎角前の咬筋上",eff:"顎関節痛",how:"じんわり緩める"},
-  "下関":{loc:"頬骨弓の下",eff:"顎関節痛",how:"軽く開口し軽圧"},
-  "太渓":{loc:"内果とアキレス腱間",eff:"腰痛・冷え",how:"温め＋軽圧"},
-  "迎香":{loc:"小鼻外側",eff:"鼻閉",how:"上外へ軽圧"},
-  "上星":{loc:"生え際正中1指上",eff:"鼻閉・頭重",how:"点圧"},
-  "内関":{loc:"手首中央から3指上",eff:"逆流・吐き気",how:"持続軽圧"},
-  "中脘":{loc:"臍と剣状突起の中点",eff:"胃もたれ・逆流",how:"食後を避け円揉"},
-  "膻中":{loc:"乳頭間正中",eff:"胸のつかえ",how:"掌で包む"},
-  "足三里":{loc:"脛骨稜外1・下3",eff:"胃腸・全身",how:"やや強め"},
-  "三陰交":{loc:"内果上4指",eff:"PMS・冷え",how:"温め＋軽圧"},
-  "関元":{loc:"臍下3寸",eff:"下腹の冷え",how:"保温＋軽圧"},
-  "気海":{loc:"臍下1.5寸",eff:"疲労・冷え",how:"腹式呼吸併用"},
-  "環跳":{loc:"股関節外側のくぼみ",eff:"坐骨神経痛",how:"殿筋リリース併用"},
-  "殷門":{loc:"大腿後面中央",eff:"坐骨神経痛",how:"フォームローラー"},
-  "委中":{loc:"膝窩中央",eff:"腰背部痛",how:"軽屈で押圧"},
-  "承山":{loc:"腓腹筋V字下端",eff:"ふくらはぎ張り",how:"つま先立ち併用"},
-  "承扶":{loc:"坐骨結節の下",eff:"坐骨神経痛",how:"短時間"},
-  "陽陵泉":{loc:"腓骨頭前下",eff:"膝外側痛",how:"外側ラインほぐし"},
-  "解谿":{loc:"足首前面腱間",eff:"足関節痛",how:"可動域内で軽圧"},
-  "崑崙":{loc:"外果とアキレス腱間",eff:"足関節痛・腰痛",how:"短時間指圧"},
-  "丘墟":{loc:"外果前下",eff:"捻挫後ケア",how:"円揉"},
-  "申脈":{loc:"外果直下",eff:"足首安定",how:"骨沿いに軽圧"}
-};
-
-/* 状態 */
 const svgObj = document.getElementById('svgObj');
-const symSelect = document.getElementById('symSelect');
-const notesEl = document.getElementById('notes');
-let svgDoc=null, nameToDot=new Map(), nameToTexts=new Map(), nameToAux=new Map();
+let svgDoc, nameToElements = new Map();
 
-/* SVGロード：ツボ名⇔黒点⇔近接補助線ひも付け */
 svgObj.addEventListener('load', () => {
-  svgDoc = svgObj.contentDocument; if(!svgDoc) return;
+  svgDoc = svgObj.contentDocument;
   const circles = Array.from(svgDoc.querySelectorAll('circle'));
-  const texts   = Array.from(svgDoc.querySelectorAll('text'));
-  const lines   = Array.from(svgDoc.querySelectorAll('line'));
-
-  texts.forEach(t=>{
-    const name=(t.textContent||"").trim().replace(/\s+/g,""); if(!name) return;
-    const b=t.getBBox(), tx=b.x+b.width/2, ty=b.y+b.height/2;
-    let best=null, d2min=Infinity;
+  const texts = Array.from(svgDoc.querySelectorAll('text'));
+  texts.forEach(t => {
+    const name = t.textContent.trim();
+    if(!name) return;
+    const tb = t.getBBox(), tx = tb.x + tb.width/2, ty = tb.y + tb.height/2;
+    let best=null,bestD=1e9;
     circles.forEach(c=>{
-      const cx=+c.getAttribute('cx')||0, cy=+c.getAttribute('cy')||0;
-      const d2=(cx-tx)*(cx-tx)+(cy-ty)*(cy-ty);
-      if(d2<d2min){d2min=d2; best=c;}
+      const cx=parseFloat(c.getAttribute('cx')||0), cy=parseFloat(c.getAttribute('cy')||0);
+      const d=(cx-tx)**2+(cy-ty)**2;
+      if(d<bestD){bestD=d;best=c;}
     });
     if(best){
-      if(!nameToDot.has(name)) nameToDot.set(name,best);
-      if(!nameToTexts.has(name)) nameToTexts.set(name,[]);
-      nameToTexts.get(name).push(t);
+      if(!nameToElements.has(name)) nameToElements.set(name,{text:t,dot:best});
     }
   });
-
-  // 近い短い line を補助線として関連付け
-  const dist=(x1,y1,x2,y2)=>Math.hypot(x1-x2,y1-y2);
-  const len=ln=>Math.hypot((+ln.getAttribute('x1')||0)-(+ln.getAttribute('x2')||0),
-                           (+ln.getAttribute('y1')||0)-(+ln.getAttribute('y2')||0));
-  nameToDot.forEach((dot,name)=>{
-    const cx=+dot.getAttribute('cx')||0, cy=+dot.getAttribute('cy')||0;
-    const near=lines.filter(ln=>{
-      const x1=+ln.getAttribute('x1')||0, y1=+ln.getAttribute('y1')||0;
-      const x2=+ln.getAttribute('x2')||0, y2=+ln.getAttribute('y2')||0;
-      return len(ln)<=60 && Math.min(dist(cx,cy,x1,y1), dist(cx,cy,x2,y2))<=40;
-    });
-    if(near.length) nameToAux.set(name,near);
-  });
-
-  // 初期は全表示
-  showOnly([]); renderNotes([]);
 });
 
-/* 表示制御：指定ツボだけ残す（空なら全表示） */
-function showOnly(names){
-  if(!svgDoc) return;
-  const want=new Set(names);
-  // まず全部隠す
-  nameToDot.forEach(el=>el.classList.add('_hide'));
-  nameToTexts.forEach(arr=>arr.forEach(t=>t.classList.add('_hide')));
-  nameToAux.forEach(arr=>arr.forEach(l=>l.classList.add('_hide')));
-
-  if(!names.length){
-    // 全表示
-    nameToDot.forEach(el=>{el.classList.remove('_hide','_show')});
-    nameToTexts.forEach(arr=>arr.forEach(t=>t.classList.remove('_hide')));
-    nameToAux.forEach(arr=>arr.forEach(l=>l.classList.remove('_hide')));
-    return;
-  }
-  // 対象のみ表示
-  want.forEach(n=>{
-    const d=nameToDot.get(n); if(d){d.classList.remove('_hide'); d.classList.add('_show');}
-    (nameToTexts.get(n)||[]).forEach(t=>t.classList.remove('_hide'));
-    (nameToAux.get(n)||[]).forEach(l=>l.classList.remove('_hide'));
+function applySymptom(){
+  const val=document.getElementById('symSelect').value;
+  if(!svgDoc||!val)return;
+  const showList=symptomMap[val]||[];
+  nameToElements.forEach((pair,name)=>{
+    const visible=showList.includes(name);
+    pair.text.style.display=visible?"":"none";
+    pair.dot.style.display=visible?"":"none";
   });
 }
 
-/* 解説 */
-function renderNotes(names){
-  if(!names.length){ notesEl.innerHTML='<div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div>'; return; }
-  notesEl.innerHTML="";
-  names.forEach(n=>{
-    const d=info[n]||{};
-    const el=document.createElement('div'); el.className='note';
-    el.innerHTML = `<h3>${n}</h3>
-      <p><strong>位置：</strong>${d.loc||"（調整中）"}</p>
-      <p><strong>効能：</strong>${d.eff||"（調整中）"}</p>
-      <p><strong>押し方：</strong>${d.how||"（調整中）"}</p>`;
-    notesEl.appendChild(el);
+function clearAll(){
+  if(!svgDoc)return;
+  nameToElements.forEach(pair=>{
+    pair.text.style.display="";
+    pair.dot.style.display="";
   });
+  document.getElementById('symSelect').value="";
 }
 
-/* ▼ ここが“即反映”ポイント：change/input で反映 */
-function applyBySelect(){
-  const key = symSelect.value;
-  const names = key ? (symptomMap[key]||[]) : [];
-  showOnly(names); renderNotes(names);
-}
-const symSelect = document.getElementById('symSelect');
-symSelect.addEventListener('change', applyBySelect);
-symSelect.addEventListener('input',  applyBySelect); // モバイルの一部で有効
-
-/* クリア */
-document.getElementById('clear').onclick = () => { symSelect.value=""; showOnly([]); renderNotes([]); };
+document.getElementById('apply').onclick=applySymptom;
+document.getElementById('clear').onclick=clearAll;
 </script>
 </body>
 </html>
