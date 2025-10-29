@@ -34,7 +34,7 @@
     <header class="mb-6 flex items-center justify-between gap-3">
       <div>
         <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">鍼灸ツボ辞典｜教科書準拠版</h1>
-        <p class="text-sm text-slate-600">症状を選ぶ → 推奨ツボ一覧 → 人体シルエットで位置を可視化。『臨床経穴ポケットガイド361穴』の見出し構造（経脈→経穴→部位/穴性）に沿って表示。※刺鍼方法は表示せず、押圧にも使えるよう「深さ（目安）」のみ記載します。</p>
+        <p class="text-sm text-slate-600">症状を選ぶ → 推奨ツボ一覧 → 人体シルエットで位置を可視化。参考書籍：『臨床経穴ポケットガイド361穴』「深さ（目安）一寸＝患者さんの指1本サイズ」。</p>
       </div>
       <div class="flex items-center gap-2">
         <button id="toggleTextbook" class="btn" aria-pressed="true">教科書準拠モード: <span id="modeLabel">ON</span></button>
@@ -69,7 +69,8 @@
           </div>
         </div>
 
-        <div id="list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        <div class=\"text-xs text-slate-500 -mt-2 mb-2\">計測の目安：<span class=\"chip\">1寸 ≒ 親指の横幅</span> <span class=\"chip\">2寸 ≒ 人差し指＋中指の横幅</span> <span class=\"chip\">3寸 ≒ 四横指</span>（自分の指で測ると誤差が少ない）</div>
+        <div id=\"list\" class=\"grid grid-cols-1 md:grid-cols-2 gap-3\"></div>
       </section>
 
       <!-- RIGHT: Human Body Map -->
@@ -111,6 +112,11 @@ const POINTS = [
   {id:"GV20", nameJP:"百会", nameEN:"Baihui", meridian:"督脈", region:"頭頂部",
    location:"両耳尖を結ぶ線の正中上、頭頂の陥凹（前髪際と後髪際を9等分し上から5/9）",
    locationSimple:"頭のてっぺん。両耳の先端を結んだ線のまんなか。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>両耳のいちばん高い所（耳尖）を指で触れ、左右を結ぶ線をイメージ。</li>
+     <li>その線と頭のまん中（正中線）が交わる点に触れる。</li>
+     <li>前髪際と後髪際の距離を9等分すると「前から5/9」付近。軽いくぼみが触れれば百会。</li>
+   </ol>`,
    indications:["頭痛","めまい","意識障害","脱肛・痔","気分安定"],
    depth:"0.3–0.5寸（浅）",
    notes:"陽経交会所。昇陽挙陥・安神。",
@@ -118,6 +124,11 @@ const POINTS = [
   {id:"TE5", nameJP:"外関", nameEN:"Waiguan", meridian:"手少陽三焦経", region:"前腕背側",
    location:"手関節背横紋の上2寸、橈尺骨間の溝中。",
    locationSimple:"手首の甲側のシワから肘に向かって指3本ぶん上、2本の骨の間のくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>手の甲を上にして手首の横ジワ（背側）を見つける。</li>
+     <li>そこから肘方向へ自分の指3本ぶん（約2寸）進む。</li>
+     <li>橈骨と尺骨の間のくぼみの真ん中が外関。</li>
+   </ol>`,
    indications:["頭痛・こめかみ","耳鳴り","悪寒発熱","頸肩こり"],
    depth:"0.5–1.0寸",
    notes:"絡穴・八脈交会穴（陽維脈）。",
@@ -125,6 +136,11 @@ const POINTS = [
   {id:"GB20", nameJP:"風池", nameEN:"Fengchi", meridian:"足少陽胆経", region:"後頸部",
    location:"乳様突起と僧帽筋外縁の間の陥凹、後頭骨下縁。",
    locationSimple:"耳のうしろの骨と首の太い筋のあいだのくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>耳のうしろの丸い骨（乳様突起）に触れる。</li>
+     <li>首の後ろの太い筋（僧帽筋外縁）とのあいだをたどる。</li>
+     <li>後頭骨のふちの下、指が吸い込まれるくぼみが風池。</li>
+   </ol>`,
    indications:["片頭痛","頸肩こり","めまい","眼精疲労","感冒初期"],
    depth:"0.5–1.0寸（斜刺方向注意）",
    notes:"頭頸部の要穴。",
@@ -132,6 +148,11 @@ const POINTS = [
   {id:"LI4", nameJP:"合谷", nameEN:"Hegu", meridian:"手陽明大腸経", region:"手背",
    location:"第1・2中手骨の間、中手骨底の遠位で第2中手骨橈側。",
    locationSimple:"親指と人さし指の骨が交わるところのくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>親指と人さし指で「L字」を作り、付け根の山（虎口）を作る。</li>
+     <li>その山のてっぺんより少し人さし指側のくぼみが合谷。</li>
+     <li>押すとズーンと響くポイントを探す。</li>
+   </ol>`,
    indications:["頭痛","顔面痛","歯痛","感冒初期","鎮痛・鎮静"],
    depth:"0.5–1.0寸（妊婦注意）",
    notes:"四総穴の一。鎮痛要穴。",
@@ -139,6 +160,11 @@ const POINTS = [
   {id:"LR3", nameJP:"太衝", nameEN:"Taichong", meridian:"足厥陰肝経", region:"足背",
    location:"第1・2中足骨間後方の陥凹。",
    locationSimple:"足の甲、親指と人さし指の骨のあいだを足首側へたどったくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>足の指の間（1-2趾間）から甲を足首方向へなで上げる。</li>
+     <li>骨と骨の分かれ目の先に、指が落ち込むくぼみがある。</li>
+     <li>そこが太衝。</li>
+   </ol>`,
    indications:["情緒不安","頭痛","月経痛","上熱下寒の調整"],
    depth:"0.3–0.8寸",
    notes:"肝気鬱結の代表穴。",
@@ -146,6 +172,10 @@ const POINTS = [
   {id:"LI11", nameJP:"曲池", nameEN:"Quchi", meridian:"手陽明大腸経", region:"肘部",
    location:"肘窩横紋外端、上腕骨外上顆前縁。",
    locationSimple:"肘を曲げた時のシワの外はし。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>肘を90°に曲げ、肘のシワ（肘窩横紋）を確認。</li>
+     <li>シワの外端で、骨の出っ張り（外上顆）より前側のくぼみが曲池。</li>
+   </ol>`,
    indications:["清熱","皮膚炎・蕁麻疹","肘痛"],
    depth:"0.5–1.5寸",
    notes:"清熱・皮膚の要穴。",
@@ -153,6 +183,11 @@ const POINTS = [
   {id:"PC6", nameJP:"内関", nameEN:"Neiguan", meridian:"手厥陰心包経", region:"前腕掌側",
    location:"手関節掌側横紋の上2寸、橈側手根屈筋腱と長掌筋腱の間。",
    locationSimple:"手首の内側のシワから肘に向かって指3本ぶん上、2本の腱の間。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>手のひら側の手首の横ジワ（掌側）を見つける。</li>
+     <li>そこから肘方向へ自分の指3本ぶん進む。</li>
+     <li>2本の腱（長掌筋腱と橈側手根屈筋腱）の真ん中が内関。</li>
+   </ol>`,
    indications:["悪心・嘔吐","動悸","胸悶","自律神経調整"],
    depth:"0.5–1.0寸",
    notes:"乗り物酔い有名。",
@@ -160,6 +195,11 @@ const POINTS = [
   {id:"SP10", nameJP:"血海", nameEN:"Xuehai", meridian:"足太陰脾経", region:"大腿内側",
    location:"膝蓋骨内上縁の上2寸、内側広筋の隆起部。",
    locationSimple:"膝のお皿の内側上端から指3本上、内ももの盛り上がり。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>膝のお皿の内側上角に指を置く。</li>
+     <li>そこから太もも方向へ指3本ぶん上がる。</li>
+     <li>内側の筋肉が盛り上がる所（内側広筋）が血海。</li>
+   </ol>`,
    indications:["皮膚瘙痒","湿疹","月経不順"],
    depth:"0.8–1.2寸",
    notes:"血の海。",
@@ -167,20 +207,34 @@ const POINTS = [
   {id:"GV16", nameJP:"風府", nameEN:"Fengfu", meridian:"督脈", region:"後頭部",
    location:"後髪際の中央、うなじの陥凹。",
    locationSimple:"うなじのまんなかのくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>後頭部の髪の生え際の中央に触れる。</li>
+     <li>すぐ下のうなじのくぼみ（正中）に指が入る所が風府。</li>
+   </ol>`,
    indications:["後頭部痛","めまい","精神緊張"],
    depth:"0.3–0.5寸（浅）",
    notes:"頭項の要穴。",
    src:"GV p.27"},
   {id:"ST36", nameJP:"足三里", nameEN:"Zusanli", meridian:"足陽明胃経", region:"下腿前外側",
-   location:"犢鼻（膝蓋骨外下縁の窪み）から下3寸、脛骨前稜外方一横指。",
+   location:"犢鼻から下3寸、脛骨前稜外方一横指。",
    locationSimple:"膝のお皿の外側下のくぼみから指4本ぶん下、すね骨の外側。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>膝のお皿の外側下のくぼみ（犢鼻）を探す。</li>
+     <li>そこから下へ自分の四横指（約3寸）進む。</li>
+     <li>すね骨の外側のキワ、押すと響く所が足三里。</li>
+   </ol>`,
    indications:["胃もたれ","全身疲労","免疫調整","下肢痛"],
    depth:"0.8–1.5寸",
    notes:"養生の要穴。",
    src:"ST p.97–99"},
   {id:"SP6", nameJP:"三陰交", nameEN:"Sanyinjiao", meridian:"足太陰脾経", region:"下腿内側",
-   location:"内くるぶしの最上点から上3寸、脛骨後縁。",
+   location:"内果尖から上3寸、脛骨後縁。",
    locationSimple:"内くるぶしのいちばん高い所から指4本ぶん上、すね骨のうしろ側のキワ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>内くるぶしの最も高い点に指を置く。</li>
+     <li>そこから上へ四横指（約3寸）。</li>
+     <li>すね骨の後ろ側のキワ（骨際）が三陰交。</li>
+   </ol>`,
    indications:["月経痛","冷え","不眠","むくみ"],
    depth:"0.5–1.0寸（妊婦注意）",
    notes:"脾・肝・腎の交会。",
@@ -188,6 +242,11 @@ const POINTS = [
   {id:"CV6", nameJP:"気海", nameEN:"Qihai", meridian:"任脈", region:"下腹部",
    location:"臍下1.5寸。",
    locationSimple:"へその下、指2本ぶんのところ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>へそに指を置く。</li>
+     <li>そこから下へ人差し指＋中指の幅（約1.5〜2寸）下がる。</li>
+     <li>正中線上が気海。</li>
+   </ol>`,
    indications:["冷え","腹痛","疲労","泌尿生殖症状"],
    depth:"0.5–1.0寸",
    notes:"元気を養う要穴。",
@@ -195,6 +254,11 @@ const POINTS = [
   {id:"CV4", nameJP:"関元", nameEN:"Guanyuan", meridian:"任脈", region:"下腹部",
    location:"臍下3寸。",
    locationSimple:"へその下、指4本ぶんのところ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>へそに指を置く。</li>
+     <li>そこから下へ四横指（約3寸）おりる。</li>
+     <li>正中線上が関元。</li>
+   </ol>`,
    indications:["月経痛","泌尿器","冷え"],
    depth:"0.5–1.0寸",
    notes:"婦人科で多用。",
@@ -202,6 +266,10 @@ const POINTS = [
   {id:"CV12", nameJP:"中脘", nameEN:"Zhongwan", meridian:"任脈", region:"上腹部",
    location:"臍上4寸。",
    locationSimple:"みぞおちとへそのまん中より少し上（へそから指4本上）。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>へそから上へ四横指（約4寸）。</li>
+     <li>正中線上の押して響く所が中脘。</li>
+   </ol>`,
    indications:["胃もたれ","食欲不振","胃痛","げっぷ"],
    depth:"0.5–1.0寸",
    notes:"胃の募穴。",
@@ -209,6 +277,10 @@ const POINTS = [
   {id:"BL2", nameJP:"攅竹", nameEN:"Cuanzhu", meridian:"足太陽膀胱経", region:"眉頭部",
    location:"眉頭内側端のくぼみ。",
    locationSimple:"眉毛の内側の端のくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>眉毛の内端（鼻側の端）に触れる。</li>
+     <li>骨のくぼみで圧痛が出る点が攅竹。</li>
+   </ol>`,
    indications:["眼精疲労","頭痛","涙目"],
    depth:"0.3–0.5寸（浅）",
    notes:"眼周囲の要穴。",
@@ -216,6 +288,10 @@ const POINTS = [
   {id:"LI20", nameJP:"迎香", nameEN:"Yingxiang", meridian:"手陽明大腸経", region:"鼻翼外側",
    location:"鼻唇溝中、鼻翼外縁の中点。",
    locationSimple:"小鼻の横のほうれい線の上。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>小鼻の外側のふち（鼻翼）に指を置く。</li>
+     <li>ほうれい線上で鼻の横の中点が迎香。</li>
+   </ol>`,
    indications:["鼻づまり","くしゃみ","嗅覚低下"],
    depth:"0.3–0.5寸（浅）",
    notes:"鼻症状の定番。",
@@ -223,6 +299,10 @@ const POINTS = [
   {id:"HT7", nameJP:"神門", nameEN:"Shenmen", meridian:"手少陰心経", region:"手関節部",
    location:"手関節横紋の尺側端、豆状骨の近くのくぼみ。",
    locationSimple:"手首の横ジワの小指側の端のくぼみ。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>手首の横ジワを見つける。</li>
+     <li>小指側の端、豆状骨の前のくぼみが神門。</li>
+   </ol>`,
    indications:["不眠","不安","動悸"],
    depth:"0.3–0.5寸",
    notes:"安神の要穴。",
@@ -230,6 +310,11 @@ const POINTS = [
   {id:"BL23", nameJP:"腎兪", nameEN:"Shenshu", meridian:"足太陽膀胱経", region:"腰部",
    location:"第2腰椎棘突起下縁の外方1.5寸。",
    locationSimple:"腰のど真ん中（背骨）の少し下から左右に指2本ぶん外。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>背骨の腰の少し高い位置で、ウエストの高さ付近を探す。</li>
+     <li>背骨の真ん中から左右に指2本ぶん外（約1.5寸）。</li>
+     <li>圧痛が出やすい筋腹上が腎兪。</li>
+   </ol>`,
    indications:["腰痛","冷え","頻尿","疲労"],
    depth:"0.5–1.0寸",
    notes:"腰痛の要穴。",
@@ -237,6 +322,10 @@ const POINTS = [
   {id:"BL25", nameJP:"大腸兪", nameEN:"Dachangshu", meridian:"足太陽膀胱経", region:"腰部",
    location:"第4腰椎棘突起下縁の外方1.5寸。",
    locationSimple:"腰の中央より少し下の背骨から左右に指2本ぶん外。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>骨盤の上端（上後腸骨棘のライン）を目安に、背骨の中央を確認。</li>
+     <li>その高さ付近で背骨から左右に指2本ぶん外（約1.5寸）。</li>
+   </ol>`,
    indications:["腰痛","便秘","下痢"],
    depth:"0.5–1.0寸",
    notes:"腰背部の要穴。",
@@ -244,6 +333,10 @@ const POINTS = [
   {id:"GV3", nameJP:"腰陽関", nameEN:"Yaoyangguan", meridian:"督脈", region:"腰部",
    location:"第4腰椎棘突起下の陥凹（L4/5）。",
    locationSimple:"腰の真ん中、背骨のくぼみ（おへその真裏あたり）。",
+   locationDetail:`<ol class="list-decimal ml-5 space-y-1">
+     <li>へその真裏の背中側を目安に背骨上を辿る。</li>
+     <li>腰の中央のくぼみ（L4/5間）が腰陽関。</li>
+   </ol>`,
    indications:["腰痛","下肢のだるさ"],
    depth:"0.5–1.0寸",
    notes:"腰部の要穴。",
@@ -302,9 +395,9 @@ function cardHTML(p){
     </div>
     <div class="text-xs text-slate-500">${p.nameEN} / ${p.region}</div>
     <div><span class="text-xs text-slate-500">場所（やさしい説明）</span><div class="text-sm">${p.locationSimple||p.location}</div></div>
-    <details class="mt-1">
-      <summary class="text-xs text-slate-500 cursor-pointer">詳しい取穴法</summary>
-      <div class="text-sm mt-1">${p.location}</div>
+    <details class="mt-1" open>
+      <summary class="text-xs text-slate-500 cursor-pointer">詳しい取穴法（ステップ）</summary>
+      <div class="text-sm mt-1">${p.locationDetail || p.location}</div>
     </details>
     <div><span class="text-xs text-slate-500">穴性・適応</span><div class="text-sm flex flex-wrap gap-1">${p.indications.map(i=>`<span class=\"chip\">${i}</span>`).join(' ')}</div></div>
     <div class="grid grid-cols-2 gap-2">
