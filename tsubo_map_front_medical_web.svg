@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
+  <title>鍼灸ツボマップ（前面・医学イラスト風・Web）</title>
+  <rect width="1200" height="675" fill="white"/>
+  <defs>
+    <style><![CDATA[
+      .sil{fill:none;stroke:#64748b;stroke-width:2;opacity:.9}
+      .shade{fill:#f8e7de;opacity:.9;stroke:none}
+      .lm{fill:none;stroke:#94a3b8;stroke-width:2;opacity:.8}
+      .lm-txt{fill:#64748b;font-size:18px;text-anchor:middle}
+      .pt{fill:#111111;stroke:#ffffff;stroke-width:2}
+      .lbl{fill:#0f172a;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;font-size:22px}
+    ]]></style>
+  </defs>
+
+  <!-- 軽い陰影（教科書風トーン） -->
+  <g class="shade">
+    <ellipse cx="600" cy="120" rx="70" ry="90"/>
+    <path d="M510 200 Q 600 240 690 200 L 700 420 Q 600 490 500 420 Z"/>
+    <path d="M500 420 Q 520 520 540 640 L 560 660 Q 540 510 510 420 Z"/>
+    <path d="M700 420 Q 680 520 660 640 L 640 660 Q 660 510 690 420 Z"/>
+  </g>
+
+  <!-- 人体輪郭（前面） -->
+  <g class="sil">
+    <circle cx="600" cy="60" r="35"/>
+    <path d="M510 200 Q 600 240 690 200 L 700 420 Q 600 490 500 420 Z"/>
+    <path d="M510 200 L 420 360"/>
+    <path d="M690 200 L 780 360"/>
+    <path d="M560 490 L 540 660"/>
+    <path d="M640 490 L 660 660"/>
+  </g>
+
+  <!-- ランドマーク（前面） -->
+  <g class="lm">
+    <line x1="520" y1="150" x2="680" y2="150"/><text class="lm-txt" x="600" y="135">鎖骨</text>
+    <line x1="480" y1="230" x2="720" y2="230"/><text class="lm-txt" x="600" y="215">肋弓</text>
+    <line x1="480" y1="300" x2="720" y2="300"/><text class="lm-txt" x="600" y="285">臍（L3–L4）</text>
+    <line x1="490" y1="360" x2="710" y2="360"/><text class="lm-txt" x="600" y="345">鼠径線</text>
+    <line x1="500" y1="480" x2="700" y2="480"/><text class="lm-txt" x="600" y="465">膝蓋</text>
+    <line x1="520" y1="630" x2="680" y2="630"/><text class="lm-txt" x="600" y="615">内外果</text>
+  </g>
+
+  <!-- ツボ（黒点＋日本語名） front 35点 -->
+  <g>
+    <circle class="pt" cx="600" cy="40" r="6"/><text class="lbl" x="610" y="32">百会</text>
+    <circle class="pt" cx="600" cy="95" r="6"/><text class="lbl" x="610" y="87">印堂</text>
+    <circle class="pt" cx="650" cy="170" r="6"/><text class="lbl" x="660" y="162">迎香</text>
+    <circle class="pt" cx="680" cy="160" r="6"/><text class="lbl" x="690" y="152">下関</text>
+    <circle class="pt" cx="660" cy="190" r="6"/><text class="lbl" x="670" y="182">頬車</text>
+
+    <circle class="pt" cx="720" cy="180" r="6"/><text class="lbl" x="730" y="172">肩髃</text>
+    <circle class="pt" cx="720" cy="200" r="6"/><text class="lbl" x="730" y="192">肩髎</text>
+    <circle class="pt" cx="480" cy="190" r="6"/><text class="lbl" x="490" y="182">臑兪</text>
+
+    <circle class="pt" cx="700" cy="300" r="6"/><text class="lbl" x="710" y="292">曲池</text>
+    <circle class="pt" cx="690" cy="340" r="6"/><text class="lbl" x="700" y="332">手三里</text>
+
+    <circle class="pt" cx="560" cy="330" r="6"/><text class="lbl" x="570" y="322">列缺</text>
+    <circle class="pt" cx="540" cy="350" r="6"/><text class="lbl" x="550" y="342">外関</text>
+    <circle class="pt" cx="555" cy="365" r="6"/><text class="lbl" x="565" y="357">内関</text>
+    <circle class="pt" cx="565" cy="395" r="6"/><text class="lbl" x="575" y="387">神門</text>
+    <circle class="pt" cx="535" cy="395" r="6"/><text class="lbl" x="545" y="387">合谷</text>
+
+    <circle class="pt" cx="600" cy="210" r="6"/><text class="lbl" x="610" y="202">膻中</text>
+    <circle class="pt" cx="600" cy="260" r="6"/><text class="lbl" x="610" y="252">中脘</text>
+    <circle class="pt" cx="660" cy="290" r="6"/><text class="lbl" x="670" y="282">天枢</text>
+    <circle class="pt" cx="600" cy="330" r="6"/><text class="lbl" x="610" y="322">気海</text>
+    <circle class="pt" cx="600" cy="350" r="6"/><text class="lbl" x="610" y="342">関元</text>
+
+    <circle class="pt" cx="660" cy="520" r="6"/><text class="lbl" x="670" y="512">足三里</text>
+    <circle class="pt" cx="690" cy="470" r="6"/><text class="lbl" x="700" y="462">梁丘</text>
+    <circle class="pt" cx="560" cy="460" r="6"/><text class="lbl" x="570" y="452">血海</text>
+    <circle class="pt" cx="580" cy="540" r="6"/><text class="lbl" x="590" y="532">三陰交</text>
+
+    <circle class="pt" cx="680" cy="560" r="6"/><text class="lbl" x="690" y="552">陽陵泉</text>
+    <circle class="pt" cx="660" cy="540" r="6"/><text class="lbl" x="670" y="532">豊隆</text>
+    <circle class="pt" cx="600" cy="580" r="6"/><text class="lbl" x="610" y="572">委中</text>
+    <circle class="pt" cx="560" cy="560" r="6"/><text class="lbl" x="570" y="552">曲泉</text>
+
+    <circle class="pt" cx="585" cy="620" r="6"/><text class="lbl" x="595" y="612">太渓</text>
+    <circle class="pt" cx="595" cy="625" r="6"/><text class="lbl" x="605" y="617">照海</text>
+    <circle class="pt" cx="595" cy="655" r="6"/><text class="lbl" x="605" y="647">太衝</text>
+    <circle class="pt" cx="615" cy="645" r="6"/><text class="lbl" x="625" y="637">解谿</text>
+    <circle class="pt" cx="640" cy="635" r="6"/><text class="lbl" x="650" y="627">丘墟</text>
+
+    <circle class="pt" cx="680" cy="140" r="6"/><text class="lbl" x="690" y="132">肩井</text>
+    <circle class="pt" cx="610" cy="660" r="6"/><text class="lbl" x="620" y="652">内庭</text>
+  </g>
+</svg>
