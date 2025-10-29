@@ -1,50 +1,274 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ツボマップ（前面図）</title>
-  <style>
-    body {
-      margin: 0;
-      background: #fafafa;
-      font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
-      color: #333;
-      text-align: center;
-    }
-    header {
-      background: #444;
-      color: white;
-      padding: 1rem;
-      font-size: 1.5rem;
-    }
-    main {
-      max-width: 1200px;
-      margin: 2rem auto;
-      background: #fff;
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    object, img {
-      width: 100%;
-      height: auto;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-    footer {
-      margin: 2rem;
-      color: #777;
-      font-size: 0.9rem;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ツボマップ（症状別ハイライト）</title>
+<style>
+  :root {
+    --accent: #0f766e;
+    --accent-2: #155e75;
+    --chip: #eef6f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background:#fafafa; color:#222;
+    font-family: "Noto Sans JP","Yu Gothic",sans-serif;
+  }
+  header { background:#444; color:#fff; padding:.9rem 1rem; font-weight:600; }
+  .wrap { max-width:1200px; margin:18px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; gap:16px; }
+  @media (max-width: 960px){ .wrap{ grid-template-columns: 1fr; } }
+  .panel {
+    background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:14px;
+    box-shadow:0 1px 4px rgba(0,0,0,.04);
+  }
+  .panel h2 { margin:.2rem 0 .8rem; font-size:1.05rem; }
+  .row { display:flex; gap:8px; align-items:center; }
+  select, input[type="search"] {
+    width:100%; padding:.6rem .7rem; border:1px solid #d7d7d7; border-radius:10px; background:#fff;
+    font-size:.95rem;
+  }
+  button {
+    padding:.55rem .8rem; border-radius:10px; border:1px solid var(--accent);
+    background:var(--accent); color:#fff; cursor:pointer; font-weight:600;
+  }
+  button.ghost { background:#fff; color:var(--accent); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip {
+    font-size:.9rem; padding:.35rem .55rem; border-radius:999px; background:var(--chip);
+    border:1px solid #d9efef; cursor:pointer; user-select:none;
+  }
+  .chip.active { background:#d1f3f1; border-color:#9fe0dc; }
+  .list { margin-top:10px; max-height:420px; overflow:auto; border-top:1px dashed #eee; padding-top:8px; }
+  .item { display:flex; align-items:center; gap:8px; padding:6px 2px; border-bottom:1px dashed #f1f1f1; }
+  .dot { width:10px; height:10px; border-radius:50%; background:#222; }
+  .item button { margin-left:auto; font-size:.85rem; padding:.35rem .55rem; }
+  .hint { color:#666; font-size:.85rem; margin-top:8px; }
+  .canvas { background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:10px; }
+  object { width:100%; height:auto; display:block; border-radius:10px; }
+  /* ハイライト効果（SVG要素に適用） */
+  ._ghost { opacity:.25; transition:opacity .2s ease; }
+  ._hit   { opacity:1 !important; filter: drop-shadow(0 0 2px rgba(15,118,110,.6)); }
+</style>
 </head>
 <body>
-  <header>ツボマップ（前面図）</header>
-  <main>
-    <object type="image/svg+xml" data="tsubo_map_front_medical_web.svg" id="tsuboMap"></object>
-    <p>※ 読み込みに失敗した場合はページを再読み込みしてください。</p>
+<header>ツボマップ（GitHub Pages｜症状別ハイライト）</header>
+
+<div class="wrap">
+  <!-- 左：操作パネル -->
+  <aside class="panel">
+    <h2>症状から選ぶ</h2>
+    <div class="row" style="margin-bottom:8px;">
+      <select id="symSelect" aria-label="症状を選択">
+        <option value="">— 症状を選択 —</option>
+        <option value="肩こり">肩こり</option>
+        <option value="頭痛">頭痛</option>
+        <option value="顎関節痛">顎関節痛</option>
+        <option value="鼻閉・花粉症">鼻閉・花粉症</option>
+        <option value="逆流性食道炎">逆流性食道炎</option>
+        <option value="PMS">PMS</option>
+        <option value="坐骨神経痛">坐骨神経痛</option>
+        <option value="足関節痛">足関節痛</option>
+      </select>
+      <button id="apply">表示</button>
+      <button class="ghost" id="clear">解除</button>
+    </div>
+
+    <div class="chips" id="symChips"></div>
+
+    <h2 style="margin-top:16px;">ツボ一覧</h2>
+    <input id="filter" type="search" placeholder="ツボ名で絞り込み（例：合谷）" />
+    <div class="list" id="tsuboList"><!-- JSで生成 --></div>
+
+    <p class="hint">※ SVG内の「ツボ名テキスト」に最も近い黒点（circle）を自動で関連付けてハイライトします。</p>
+  </aside>
+
+  <!-- 右：SVGキャンバス -->
+  <main class="panel canvas">
+    <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" aria-label="ツボマップ"></object>
   </main>
-  <footer>© 2025 ツボマップ練習用ページ（GitHub Pages）</footer>
+</div>
+
+<script>
+/* =============================
+   1) 症状→推奨ツボの対応表（自由に調整可）
+   ============================= */
+const symptomMap = {
+  "肩こり": ["肩井","風池","天柱","肩髃","曲池","合谷"],
+  "頭痛": ["百会","印堂","風池","太衝","合谷"],
+  "顎関節痛": ["頰車","下関","合谷","太渓"],
+  "鼻閉・花粉症": ["迎香","印堂","百会","合谷","上星"],
+  "逆流性食道炎": ["内関","中脘","膻中","足三里"],
+  "PMS": ["三陰交","太衝","関元","気海"],
+  "坐骨神経痛": ["環跳","殷門","委中","承山","承扶","陽陵泉"],
+  "足関節痛": ["解谿","崑崙","太谿","丘墟","申脈"]
+};
+
+/* 補助：よく使う代表的なツボ（一覧生成用）。症状表のユニオンでもOK */
+const defaultTsuboOrder = Array.from(new Set(Object.values(symptomMap).flat()))
+  .concat(["手三里","列缺","外関","合谷門","血海","梁丘","豊隆","陽陵泉","三陰交","太溪","足三里"]); // 追い足し
+
+/* =============================
+   2) SVGロード後、ツボ名⇔黒点を自動対応付け
+   ============================= */
+const svgObj = document.getElementById('svgObj');
+let svgDoc, tsuboByName = new Map(); // name -> element(circle or group)
+let allDots = []; // 対象点（見た目を薄く/戻す用）
+
+svgObj.addEventListener('load', () => {
+  svgDoc = svgObj.contentDocument;
+  if (!svgDoc) return;
+
+  // すべての circle を候補に
+  const circles = Array.from(svgDoc.querySelectorAll('circle'));
+  // すべての text（ツボラベル）を取得
+  const texts = Array.from(svgDoc.querySelectorAll('text'));
+
+  // text毎に最も近いcircleを関連付け
+  texts.forEach(t => {
+    const name = (t.textContent || "").trim().replace(/\s+/g, "");
+    if (!name) return;
+    const tb = t.getBBox();
+    const tx = tb.x + tb.width/2, ty = tb.y + tb.height/2;
+
+    let best = null, bestD = Infinity;
+    circles.forEach(c => {
+      const cx = parseFloat(c.getAttribute('cx') || '0');
+      const cy = parseFloat(c.getAttribute('cy') || '0');
+      const dx = cx - tx, dy = cy - ty;
+      const d2 = dx*dx + dy*dy;
+      if (d2 < bestD) { bestD = d2; best = c; }
+    });
+    if (best) {
+      best.classList.add('tsubo-dot');
+      best.setAttribute('data-name', name);
+      // 既に登録済みの同名はスキップ（最初の1点を代表）
+      if (!tsuboByName.has(name)) tsuboByName.set(name, best);
+    }
+  });
+
+  allDots = Array.from(svgDoc.querySelectorAll('.tsubo-dot'));
+  buildListUI();
+});
+
+/* =============================
+   3) UI 構築（症状チップ＆ツボ一覧）
+   ============================= */
+const symChips = document.getElementById('symChips');
+const symSelect = document.getElementById('symSelect');
+const listEl = document.getElementById('tsuboList');
+const filter = document.getElementById('filter');
+
+function buildListUI() {
+  // 症状チップ
+  symChips.innerHTML = "";
+  Object.keys(symptomMap).forEach(key => {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = key;
+    chip.onclick = () => {
+      symSelect.value = key;
+      applySymptom();
+      toggleActiveChip(key);
+    };
+    symChips.appendChild(chip);
+  });
+
+  renderTsuboList();
+}
+
+function renderTsuboList() {
+  const q = (filter.value || "").trim();
+  // tsuboByName ができるまで待つ（SVG未ロード時）
+  const names = tsuboByName.size ? Array.from(tsuboByName.keys()) : defaultTsuboOrder;
+  const list = names
+    .filter(n => !q || n.includes(q))
+    .sort((a,b) => a.localeCompare(b,"ja"));
+
+  listEl.innerHTML = "";
+  list.forEach(name => {
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+
+    const label = document.createElement('span');
+    label.textContent = name;
+
+    const btn = document.createElement('button');
+    btn.textContent = "ハイライト";
+    btn.onclick = () => highlightByNames([name], true);
+
+    row.appendChild(dot);
+    row.appendChild(label);
+    row.appendChild(btn);
+    listEl.appendChild(row);
+  });
+}
+
+filter.addEventListener('input', renderTsuboList);
+
+/* =============================
+   4) ハイライト制御
+   ============================= */
+function clearHighlight() {
+  if (!svgDoc) return;
+  // 全体を薄く
+  const root = svgDoc.documentElement;
+  root.querySelectorAll("*").forEach(el => el.classList.remove('_ghost','_hit'));
+}
+
+function highlightByNames(names, scrollFirst=false) {
+  if (!svgDoc) return;
+  const root = svgDoc.documentElement;
+
+  // まず全体を薄く
+  root.querySelectorAll("*").forEach(el => el.classList.add('_ghost'));
+  // 対象点だけ強調
+  let firstEl = null;
+  names.forEach(name => {
+    const el = tsuboByName.get(name);
+    if (el) {
+      el.classList.add('_hit');
+      el.classList.remove('_ghost');
+      // ラベル(text) も強調（同名テキスト）
+      Array.from(svgDoc.querySelectorAll('text'))
+        .filter(t => (t.textContent || "").trim().replace(/\s+/g,"") === name)
+        .forEach(t => { t.classList.add('_hit'); t.classList.remove('_ghost'); });
+      if (!firstEl) firstEl = el;
+    }
+  });
+
+  // スクロール（モバイルでも見失いにくくする）
+  if (scrollFirst && firstEl) {
+    const vb = svgDoc.documentElement.viewBox.baseVal;
+    if (vb && vb.width) {
+      // 軽いフラッシュ
+      firstEl.style.transition = "transform .15s ease";
+      firstEl.style.transform = "scale(1.4)";
+      setTimeout(()=> firstEl.style.transform = "scale(1)", 250);
+    }
+  }
+}
+
+/* 症状選択 */
+function applySymptom() {
+  const key = symSelect.value;
+  if (!key) return;
+  const names = symptomMap[key] || [];
+  highlightByNames(names, true);
+}
+
+function toggleActiveChip(key) {
+  Array.from(symChips.children).forEach(ch => ch.classList.toggle('active', ch.textContent === key));
+}
+
+/* ボタン */
+document.getElementById('apply').onclick = applySymptom;
+document.getElementById('clear').onclick = () => { symSelect.value=""; clearHighlight(); toggleActiveChip(""); };
+
+/* ページ初期：リストは絞り込みなしで表示 */
+</script>
 </body>
 </html>
