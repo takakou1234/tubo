@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ツボマップ｜症状で即切替（強化版）</title>
+<title>ツボマップ｜症状で即切替（該当ツボのみ表示）</title>
 <style>
   :root { --accent:#0f766e; }
   *{box-sizing:border-box}
@@ -16,12 +16,13 @@
   select{width:100%;padding:.6rem .7rem;border:1px solid #d7d7d7;border-radius:10px;background:#fff;font-size:.95rem;margin-bottom:10px}
   .btn-clear{padding:.5rem .8rem;border-radius:10px;border:1px solid var(--accent);background:#fff;color:var(--accent);cursor:pointer;font-weight:600}
   object{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #e6e6e6;background:#fff}
-  /* 完全に消す */
+
+  /* ---- SVG制御（“該当だけ残す”）---- */
   ._hide { display:none !important; }
-  /* 強調（残す側） */
   ._show { display:inline !important; filter:drop-shadow(0 0 2px rgba(15,118,110,.7)); }
-  /* 自動生成した補助マーカー */
-  ._auto-marker { fill:#0f766e; stroke:white; stroke-width:2; }
+  /* 自動生成マーカー（テキスト位置に応急で打つ点） */
+  ._auto-marker { fill:#0f766e; stroke:#fff; stroke-width:2; }
+
   /* 解説 */
   .notes{display:grid;gap:10px;margin-top:10px;max-height:420px;overflow:auto;border-top:1px dashed #eee;padding-top:10px}
   .note{border:1px solid #e9f0ef;background:#fff;border-radius:12px;padding:10px}
@@ -30,30 +31,39 @@
 </style>
 </head>
 <body>
-<header>ツボマップ（症状選択で即反映・頑丈ひも付け）</header>
+<header>ツボマップ（症状選択で即反映・該当のみ表示）</header>
 
 <div class="wrap">
+  <!-- 左：操作と解説 -->
   <aside class="panel">
     <h2>症状から選ぶ</h2>
     <select id="sym" aria-label="症状を選択">
       <option value="">— 症状を選択 —（全表示）</option>
-      <option>肩こり</option><option>頭痛</option><option>顎関節痛</option>
-      <option>鼻閉・花粉症</option><option>逆流性食道炎</option>
-      <option>PMS</option><option>坐骨神経痛</option><option>足関節痛</option>
+      <option>肩こり</option>
+      <option>頭痛</option>
+      <option>顎関節痛</option>
+      <option>鼻閉・花粉症</option>
+      <option>逆流性食道炎</option>
+      <option>PMS</option>
+      <option>坐骨神経痛</option>
+      <option>足関節痛</option>
     </select>
     <button class="btn-clear" id="reset">全表示に戻す</button>
 
     <h2 style="margin-top:14px;">選択中のツボ解説</h2>
-    <div id="notes" class="notes"><div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div></div>
+    <div id="notes" class="notes">
+      <div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div>
+    </div>
   </aside>
 
+  <!-- 右：SVG -->
   <main class="panel">
     <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" aria-label="ツボマップ"></object>
   </main>
 </div>
 
 <script>
-/* ==== 症状→ツボ ==== */
+/* ===== 症状→ツボ ===== */
 const symptomMap = {
   "肩こり": ["肩井","風池","天柱","肩髃","曲池","合谷"],
   "頭痛": ["百会","印堂","風池","太衝","合谷"],
@@ -64,7 +74,8 @@ const symptomMap = {
   "坐骨神経痛": ["環跳","殷門","委中","承山","承扶","陽陵泉"],
   "足関節痛": ["解谿","崑崙","太谿","丘墟","申脈"]
 };
-/* ==== 簡潔解説 ==== */
+
+/* ===== ツボ解説（簡潔） ===== */
 const info = {
   "肩井":{loc:"肩中央の僧帽筋上",eff:"肩こり・頭重",how:"指腹で90秒×1-2回"},
   "風池":{loc:"後頭骨下のくぼみ",eff:"頭痛・眼精疲労",how:"後頭側へ軽圧"},
@@ -92,53 +103,46 @@ const info = {
   "委中":{loc:"膝窩中央",eff:"腰背部痛",how:"軽屈で押圧"},
   "承山":{loc:"腓腹筋V字下端",eff:"ふくらはぎ張り",how:"つま先立ち併用"},
   "承扶":{loc:"坐骨結節の下",eff:"坐骨神経痛",how:"短時間"},
-  "陽陵泉":{loc:"腓骨頭前下",eff:"膝外側痛",how:"外側ラインほぐし"},
+  "陽陵泉":{loc:"腓骨頭前下",eff:"膝外側痛",how:"外側ラインをほぐす"},
   "解谿":{loc:"足首前面腱間",eff:"足関節痛",how:"可動域内で軽圧"},
   "崑崙":{loc:"外果とアキレス腱間",eff:"足関節痛・腰痛",how:"短時間指圧"},
   "丘墟":{loc:"外果前下",eff:"捻挫後ケア",how:"円揉"},
   "申脈":{loc:"外果直下",eff:"足首安定",how:"骨沿いに軽圧"}
 };
 
-/* ==== 内部状態 ==== */
-const sym = document.getElementById('sym');
+/* ===== 内部状態 ===== */
+const sym   = document.getElementById('sym');
 const notes = document.getElementById('notes');
-const svgObj = document.getElementById('svgObj');
+const svgObj= document.getElementById('svgObj');
 
 let svgDoc=null;
-let nameToDot=new Map();    // ツボ名 → 代表点(SVG要素)
-let nameToTexts=new Map();  // ツボ名 → [text/tspan を含む text要素]
-let nameToAux=new Map();    // ツボ名 → 近接の短い line
-let autoLayer=null;         // 自動マーカーを入れるレイヤ
+let nameToDot=new Map();      // ツボ名 -> 代表点(SVG要素)
+let nameToTexts=new Map();    // ツボ名 -> [text要素...]
+let nameToAux=new Map();      // ツボ名 -> [短いline...]
+let allPoints=[], allTexts=[], allShortLines=[];
+let autoLayer=null;
 
-/* ==== ユーティリティ ==== */
 const norm = s => (s||"").replace(/\s+/g,"").replace(/[　]/g,"").trim();
-
-/* 小さい黒っぽいPATH検出（ツボ点の代用） */
-function isSmallBlackPath(el){
+const isSmallBlackPath = el => {
   if(el.tagName!=="path") return false;
   const st = getComputedStyle(el);
   const fill = (el.getAttribute('fill')||st.fill||'').toLowerCase();
-  const stroke = (el.getAttribute('stroke')||st.stroke||'').toLowerCase();
-  // 近似判定：黒 or 濃紺系、かつ細かい形状（bbox面積が小さい）
-  const bb = el.getBBox();
-  const area = bb.width * bb.height;
-  const isDark = /#000|black|#111|#222|rgb\(0,\s*0,\s*0\)/.test(fill) || (!fill && /#000|black/.test(stroke));
-  return isDark && area>0 && area < 160; // 例：幅8×高8=64 など
-}
+  const stroke= (el.getAttribute('stroke')||st.stroke||'').toLowerCase();
+  const bb = el.getBBox(); const area = bb.width * bb.height;
+  const dark = /#000|black|#111|#222|rgb\(0,\s*0,\s*0\)/.test(fill) || (!fill && /#000|black/.test(stroke));
+  return dark && area>0 && area<160; // 小さめで黒っぽい形
+};
 
-/* ==== SVGロード後、堅牢にひも付け ==== */
+/* ===== 1) SVGロード後：頑丈ひも付け ===== */
 svgObj.addEventListener('load', () => {
-  svgDoc = svgObj.contentDocument;
-  if(!svgDoc) return;
-
+  svgDoc = svgObj.contentDocument; if(!svgDoc) return;
   const root = svgDoc.documentElement;
 
-  // 自動マーカー用レイヤ（最前面）
+  // 自動マーカー用レイヤ（前面）
   autoLayer = svgDoc.createElementNS("http://www.w3.org/2000/svg","g");
-  autoLayer.setAttribute('id','auto-layer');
-  root.appendChild(autoLayer);
+  autoLayer.setAttribute('id','auto-layer'); root.appendChild(autoLayer);
 
-  // ツボ名テキスト収集（<text>の中の<tspan>も結合）
+  // すべての text を収集（tspanを結合して名前正規化）
   const texts = Array.from(svgDoc.querySelectorAll('text'));
   texts.forEach(t=>{
     const raw = Array.from(t.querySelectorAll('tspan')).map(s=>s.textContent).join('') || t.textContent;
@@ -147,92 +151,97 @@ svgObj.addEventListener('load', () => {
     if(!nameToTexts.has(name)) nameToTexts.set(name,[]);
     nameToTexts.get(name).push(t);
   });
+  allTexts = texts;
 
-  // ツボ点候補：circle, ellipse, 小さい黒いpath
+  // 点候補：circle/ellipse/小さい黒path
   const circles = Array.from(svgDoc.querySelectorAll('circle'));
-  const ellipses = Array.from(svgDoc.querySelectorAll('ellipse'));
-  const smallPaths = Array.from(svgDoc.querySelectorAll('path')).filter(isSmallBlackPath);
-  const pointCandidates = [...circles, ...ellipses, ...smallPaths];
+  const ellipses= Array.from(svgDoc.querySelectorAll('ellipse'));
+  const smallPs = Array.from(svgDoc.querySelectorAll('path')).filter(isSmallBlackPath);
+  allPoints = [...circles, ...ellipses, ...smallPs];
 
-  // テキスト中心と最短距離の候補点を対応付け（見つからなければ後で自動マーカー）
-  nameToTexts.forEach((arr, name)=>{
-    // 代表位置＝複数textがあっても平均中心
+  // テキスト中心に最も近い点を代表点に（見つからなければ自動マーカー作成）
+  nameToTexts.forEach((arr,name)=>{
     let sx=0, sy=0;
-    arr.forEach(t=>{
-      const b=t.getBBox();
-      sx += b.x + b.width/2; sy += b.y + b.height/2;
-    });
-    const tx = sx/arr.length, ty = sy/arr.length;
+    arr.forEach(t=>{ const b=t.getBBox(); sx+=b.x+b.width/2; sy+=b.y+b.height/2; });
+    const tx=sx/arr.length, ty=sy/arr.length;
 
     let best=null, bestD=Infinity;
-    pointCandidates.forEach(p=>{
+    allPoints.forEach(p=>{
       let px,py;
-      if(p.tagName==='circle'){ px=+p.getAttribute('cx')||0; py=+p.getAttribute('cy')||0; }
-      else if(p.tagName==='ellipse'){ px=+p.getAttribute('cx')||0; py=+p.getAttribute('cy')||0; }
+      if(p.tagName==='circle'||p.tagName==='ellipse'){ px=+p.getAttribute('cx')||0; py=+p.getAttribute('cy')||0; }
       else { const bb=p.getBBox(); px=bb.x+bb.width/2; py=bb.y+bb.height/2; }
       const d2=(px-tx)*(px-tx)+(py-ty)*(py-ty);
-      if(d2<bestD){bestD=d2; best=p;}
+      if(d2<bestD){ bestD=d2; best=p; }
     });
+
     if(best){
-      if(!nameToDot.has(name)) nameToDot.set(name,best);
+      nameToDot.set(name,best);
     }else{
-      // 候補がどうしても無い→自動マーカー生成
+      // 無ければテキスト位置に仮マーカーを生成（確実に可視化）
       const mk = svgDoc.createElementNS("http://www.w3.org/2000/svg","circle");
-      mk.setAttribute('cx', tx); mk.setAttribute('cy', ty);
-      mk.setAttribute('r', 5); mk.setAttribute('class','_auto-marker');
+      mk.setAttribute('cx',tx); mk.setAttribute('cy',ty); mk.setAttribute('r',5);
+      mk.setAttribute('class','_auto-marker');
       autoLayer.appendChild(mk);
-      nameToDot.set(name, mk);
+      nameToDot.set(name,mk);
+      allPoints.push(mk);
     }
   });
 
-  // 近接の短い line を補助線として関連付け
+  // 短いlineとの関連付け（ラベル引き出し線など）
   const lines = Array.from(svgDoc.querySelectorAll('line'));
   const dist=(x1,y1,x2,y2)=>Math.hypot(x1-x2,y1-y2);
   const len = ln=>Math.hypot((+ln.getAttribute('x1')||0)-(+ln.getAttribute('x2')||0),
                              (+ln.getAttribute('y1')||0)-(+ln.getAttribute('y2')||0));
+  allShortLines = lines.filter(ln=>len(ln)<=60);
   nameToDot.forEach((dot,name)=>{
     let px,py;
-    if(dot.tagName==='circle' || dot.tagName==='ellipse'){ px=+dot.getAttribute('cx')||0; py=+dot.getAttribute('cy')||0; }
+    if(dot.tagName==='circle'||dot.tagName==='ellipse'){ px=+dot.getAttribute('cx')||0; py=+dot.getAttribute('cy')||0; }
     else { const bb=dot.getBBox(); px=bb.x+bb.width/2; py=bb.y+bb.height/2; }
-    const near = lines.filter(ln=>{
+    const near = allShortLines.filter(ln=>{
       const x1=+ln.getAttribute('x1')||0, y1=+ln.getAttribute('y1')||0;
       const x2=+ln.getAttribute('x2')||0, y2=+ln.getAttribute('y2')||0;
-      const L=len(ln), d=Math.min(dist(px,py,x1,y1), dist(px,py,x2,y2));
-      return L<=60 && d<=40;
+      const d=Math.min(dist(px,py,x1,y1), dist(px,py,x2,y2));
+      return d<=40;
     });
-    if(near.length) nameToAux.set(name, near);
+    if(near.length) nameToAux.set(name,near);
   });
 
-  // 初期は全表示
+  // 初期：全表示
   showOnly([]); renderNotes([]);
 });
 
-/* ==== 表示制御：指定ツボだけ残す（空なら全表示） ==== */
+/* ===== 2) 表示制御：全隠し→対象のみ再表示 ===== */
+let lastNames = []; // iOSのselect挙動対策（同値多発防止）
 function showOnly(names){
   if(!svgDoc) return;
+  const key = JSON.stringify(names);
+  if (key === JSON.stringify(lastNames)) return; // 無駄な再描画を抑止
+  lastNames = names.slice(0);
+
   const want=new Set(names.map(norm));
 
-  // 全隠し
-  nameToDot.forEach(el=>el.classList.add('_hide'));
-  nameToTexts.forEach(arr=>arr.forEach(t=>t.classList.add('_hide')));
-  nameToAux.forEach(arr=>arr.forEach(l=>l.classList.add('_hide')));
+  // まず“全候補”を非表示
+  allPoints.forEach(el=>el.classList.add('_hide'));
+  allTexts.forEach(t=>t.classList.add('_hide'));
+  allShortLines.forEach(l=>l.classList.add('_hide'));
 
   if(!names.length){
     // 全表示
-    nameToDot.forEach(el=>el.classList.remove('_hide','_show'));
-    nameToTexts.forEach(arr=>arr.forEach(t=>t.classList.remove('_hide')));
-    nameToAux.forEach(arr=>arr.forEach(l=>l.classList.remove('_hide')));
+    allPoints.forEach(el=>el.classList.remove('_hide','_show'));
+    allTexts.forEach(t=>t.classList.remove('_hide'));
+    allShortLines.forEach(l=>l.classList.remove('_hide'));
     return;
   }
-  // 対象だけ表示
+  // 対象のみ表示
   want.forEach(n=>{
-    const d=nameToDot.get(n); if(d){ d.classList.remove('_hide'); d.classList.add('_show'); }
+    const d=nameToDot.get(n);
+    if(d){ d.classList.remove('_hide'); d.classList.add('_show'); }
     (nameToTexts.get(n)||[]).forEach(t=>t.classList.remove('_hide'));
     (nameToAux.get(n)||[]).forEach(l=>l.classList.remove('_hide'));
   });
 }
 
-/* ==== 解説 ==== */
+/* ===== 3) 解説描画 ===== */
 function renderNotes(names){
   if(!names.length){ notes.innerHTML='<div style="color:#666;font-size:.9rem">症状を選ぶと表示されます。</div>'; return; }
   notes.innerHTML='';
@@ -247,7 +256,7 @@ function renderNotes(names){
   });
 }
 
-/* ==== イベント：プルダウン変更で即反映 ==== */
+/* ===== 4) プルダウン即反映＋全表示ボタン ===== */
 function apply(){
   const key = sym.value;
   const names = key ? (symptomMap[key]||[]) : [];
@@ -255,7 +264,7 @@ function apply(){
 }
 sym.addEventListener('change', apply);
 sym.addEventListener('input',  apply);
-document.getElementById('reset').onclick = () => { sym.value=""; showOnly([]); renderNotes([]); };
+document.getElementById('reset').addEventListener('click', ()=>{ sym.value=""; showOnly([]); renderNotes([]); });
 </script>
 </body>
 </html>
