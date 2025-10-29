@@ -2,18 +2,35 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ツボマップ（40穴・ランドマーク付き）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ツボマップ</title>
   <style>
-    body {
-      font-family: "Noto Sans JP", "游ゴシック", "Yu Gothic", sans-serif;
-      margin: 0;
-      background: #fafafa;
-      color: #333;
-      text-align: center;
-    }
-    header {
-      background: #444;
-      color: white;
-      padding: 1rem 0;
-      font-size:
+    body{margin:0;background:#fafafa;color:#222;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
+    header{padding:12px 16px;background:#444;color:#fff;text-align:center}
+    main{max-width:1200px;margin:24px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+    .hint{font-size:.9rem;color:#666;margin:8px 0 0}
+    img,object{width:100%;height:auto;display:block}
+  </style>
+</head>
+<body>
+  <header>ツボマップ（GitHub Pages）</header>
+  <main>
+    <div class="card">
+      <!-- まずは一番確実な IMG 表示 -->
+      <img src="tsubo_map_front_medical_web.svg" alt="ツボマップ（SVG）"
+           onerror="document.getElementById('fallback').style.display='block'">
+
+      <!-- OBJECT 版（インタラクティブSVGにする時はこちらを使います） -->
+      <object id="svgObject" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" style="margin-top:12px;"></object>
+
+      <p id="fallback" class="hint" style="display:none">
+        SVGの読み込みに失敗しました。ファイル名・場所を確認してください：
+        <code>tsubo_map_front_medical_web.svg</code>
+      </p>
+
+      <p class="hint">更新が反映されない場合は <strong>Ctrl + Shift + R</strong> で再読み込み。</p>
+    </div>
+  </main>
+</body>
+</html>
