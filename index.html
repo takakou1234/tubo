@@ -42,6 +42,9 @@
       </div>
     </header>
 
+    <!-- Runtime error panel -->
+    <div id="errPanel" class="hidden mb-4 p-3 text-sm rounded-xl border bg-red-50 text-red-700"></div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- LEFT: Controls & List -->
       <section class="bg-white border rounded-2xl shadow-soft p-4 space-y-4">
@@ -375,6 +378,9 @@ const byId = Object.fromEntries(POINTS.map(p=>[p.id,p]));
 
 // Fill selects
 const sel = document.getElementById('symptom');
+const errPanel = document.getElementById('errPanel');
+function showErr(msg){ if(!errPanel) return; errPanel.textContent = `エラー: ${msg}`; errPanel.classList.remove('hidden'); }
+function clearErr(){ if(!errPanel) return; errPanel.textContent=''; errPanel.classList.add('hidden'); }
 SYMPTOMS.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.label; sel.appendChild(o); });
 sel.value = "0";
 
@@ -383,7 +389,16 @@ const meridianSel = document.getElementById('meridianFilter');
 
 const sideSel = document.getElementById('viewSide');
 const searchInput = document.getElementById('search');
-const list = document.getElementById('list');
+let list = document.getElementById('list');
+if(!list){
+  // フォールバック：要素が消えた場合でも動くように左カラム末尾に生成
+  const leftSections = document.querySelectorAll('section');
+  const host = leftSections[0] || document.body;
+  list = document.createElement('div');
+  list.id = 'list';
+  list.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+  host.appendChild(list);
+}
 const dotsLayer = document.getElementById('dots');
 let textbookMode = true;
 
@@ -409,19 +424,42 @@ function cardHTML(p){
 }
 
 function render(){
-  const side = sideSel.value;
-  const ids = currentIds();
-  list.innerHTML = '';
-  ids.forEach(id=>{
-    const p = byId[id];
-    const card = document.createElement('div');
-    card.className = 'border rounded-xl p-3 hover:bg-slate-50';
-    card.dataset.id = id;
-    card.innerHTML = cardHTML(p);
-    card.addEventListener('mouseenter',()=> highlightDot(id,true));
-    card.addEventListener('mouseleave',()=> highlightDot(id,false));
-    list.appendChild(card);
-  });
+  try{
+    clearErr();
+    const side = sideSel?.value || 'front';
+    const ids = currentIds();
+    if(!Array.isArray(ids)) throw new Error('症状リストの読込に失敗しました');
+    list.innerHTML = '';
+    ids.forEach(id=>{
+      const p = byId[id];
+      if(!p) return;
+      const card = document.createElement('div');
+      card.className = 'border rounded-xl p-3 hover:bg-slate-50';
+      card.dataset.id = id;
+      card.innerHTML = cardHTML(p);
+      card.addEventListener('mouseenter',()=> highlightDot(id,true));
+      card.addEventListener('mouseleave',()=> highlightDot(id,false));
+      list.appendChild(card);
+    });
+
+    // dots
+    dotsLayer.innerHTML = '';
+    ids.forEach(id=>{
+      const c = COORDS[side] && COORDS[side][id];
+      if(!c) return;
+      const [x,y] = c;
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx',x);
+      dot.setAttribute('cy',y);
+      dot.setAttribute('class','dot');
+      dot.setAttribute('fill','currentColor');
+      dot.addEventListener('mouseenter',()=> highlightCard(id,true));
+      dot.addEventListener('mouseleave',()=> highlightCard(id,false));
+      dot.addEventListener('click',()=> scrollToCard(id));
+      dotsLayer.appendChild(dot);
+    });
+  }catch(e){ showErr(e.message); console.error(e); }
+});
 
   // dots
   dotsLayer.innerHTML = '';
@@ -481,7 +519,10 @@ function scrollToCard(id){
 searchInput.addEventListener('input', render);
 
 // Esc to clear highlights
-window.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape'){ highlightDot(SYMPTOMS[sel.value].ids[0], false); [...list.children].forEach(c=>c.classList.remove('bg-slate-50','bg-slate-100')); }});
+window.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape'){ highlightDot(SYMPTOMS[sel.value]?.ids?.[0], false); [...list.children].forEach(c=>c.classList.remove('bg-slate-50','bg-slate-100')); clearErr(); }});
+
+// グローバルエラー捕捉
+window.addEventListener('error', (e)=>{ showErr(e.message); }); [...list.children].forEach(c=>c.classList.remove('bg-slate-50','bg-slate-100')); }});
 
 render();
 </script>
