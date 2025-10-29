@@ -19,17 +19,6 @@
     .guide{stroke:currentColor;stroke-width:.4;stroke-dasharray:1 2;opacity:.35}
     .landmark{fill:currentColor;opacity:.5}
     svg.hide-guides .guide, svg.hide-guides .landmark{display:none}
-    @media (prefers-color-scheme: dark) {
-      body { background: #0b1220; color: #e5e7eb; }
-      .btn { border-color: #1f2937; }
-      .chip { border-color: #1f2937; }
-      .bg-white { background: #0f172a !important; }
-      .text-slate-500 { color: #94a3b8 !important; }
-      .text-slate-600 { color: #cbd5e1 !important; }
-      .border { border-color: #1f2937 !important; }
-      .bg-slate-50 { background: #0b1220 !important; }
-      .bg-slate-100 { background: #111827 !important; }
-    }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-white to-slate-50">
@@ -41,7 +30,6 @@
       </div>
       <div class="flex items-center gap-2">
         <label class="flex items-center gap-1 text-xs text-slate-600"><input id="toggleGuides" type="checkbox" checked> ガイド表示</label>
-        <a href="#" id="toQuiz" class="btn">クイズ版へ</a>
       </div>
     </header>
 
@@ -70,8 +58,7 @@
             <input id="search" type="text" placeholder="名称 / 英名 / 取穴 / 適応" class="w-full border rounded-xl px-3 py-2 mt-1 text-sm">
           </div>
         </div>
-
-        <div class="text-xs text-slate-500 -mt-2 mb-2">計測の目安：<span class="chip">1寸 ≒ 患者さんの指1本</span> <span class="chip">2寸 ≒ 指2本</span> <span class="chip">3寸 ≒ 指3本</span>（患者自身の指で測ると誤差が少ない）</div>
+        <div class="text-xs text-slate-500 -mt-2 mb-2">計測の目安：<span class="chip">1寸 ≒ 患者さんの指1本</span> <span class="chip">2寸 ≒ 指2本</span> <span class="chip">3寸 ≒ 指3本</span></div>
         <div id="list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </section>
 
@@ -83,17 +70,11 @@
         <div class="mt-2 relative">
           <svg id="figure" viewBox="0 0 100 230" class="w-full h-[640px] bg-slate-50 rounded-xl border">
             <g id="silhouette" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.5">
-              <!-- head -->
               <circle cx="50" cy="18" r="10"/>
-              <!-- ears -->
               <circle class="landmark" cx="40" cy="19" r="3"/>
               <circle class="landmark" cx="60" cy="19" r="3"/>
-              <!-- face marks -->
               <circle class="landmark" cx="47" cy="16" r="1"/>
               <circle class="landmark" cx="53" cy="16" r="1"/>
-              <line class="guide" x1="50" y1="18" x2="50" y2="20"/>
-              <line class="guide" x1="47" y1="22" x2="53" y2="22"/>
-              <!-- torso -->
               <path d="M35 28 Q50 34 65 28 L65 90 Q50 96 35 90 Z"/>
               <circle class="landmark" cx="43" cy="45" r="1.4"/>
               <circle class="landmark" cx="57" cy="45" r="1.4"/>
@@ -101,58 +82,44 @@
               <!-- arms -->
               <path d="M35 32 L22 72"/>
               <path d="M65 32 L78 72"/>
-              <!-- forearm bones (radius/ulna) -->
+              <!-- forearms -->
               <path class="guide" d="M22 72 L24.5 95"/>
               <path class="guide" d="M25 72 L27.5 95"/>
               <path class="guide" d="M78 72 L75.5 95"/>
               <path class="guide" d="M75 72 L72.5 95"/>
-
-              <!-- ***** BIG HANDS (≈5x visual) ***** -->
-              <ellipse cx="25" cy="110" rx="12" ry="7"/>
-              <ellipse cx="75" cy="110" rx="12" ry="7"/>
-              <!-- fingers (left) -->
+              <!-- moderately enlarged hands (1.5x) -->
+              <ellipse cx="25" cy="107" rx="8" ry="4.5"/>
+              <ellipse cx="75" cy="107" rx="8" ry="4.5"/>
+              <!-- finger lines -->
               <g class="guide">
-                <line x1="19" y1="113" x2="17.5" y2="118"/>
-                <line x1="21.5" y1="114" x2="20.5" y2="119"/>
-                <line x1="25" y1="114.5" x2="25" y2="120"/>
-                <line x1="28.5" y1="114" x2="29.5" y2="119"/>
-                <line x1="31" y1="113" x2="32.5" y2="118"/>
+                <line x1="21" y1="109" x2="20" y2="113"/>
+                <line x1="23" y1="109.5" x2="22.5" y2="113.5"/>
+                <line x1="25" y1="110" x2="25" y2="114"/>
+                <line x1="27" y1="109.5" x2="27.5" y2="113.5"/>
+                <line x1="29" y1="109" x2="30" y2="113"/>
+                <line x1="71" y1="109" x2="70" y2="113"/>
+                <line x1="73" y1="109.5" x2="72.5" y2="113.5"/>
+                <line x1="75" y1="110" x2="75" y2="114"/>
+                <line x1="77" y1="109.5" x2="77.5" y2="113.5"/>
+                <line x1="79" y1="109" x2="80" y2="113"/>
               </g>
-              <!-- fingers (right) -->
-              <g class="guide">
-                <line x1="69" y1="113" x2="67.5" y2="118"/>
-                <line x1="71.5" y1="114" x2="70.5" y2="119"/>
-                <line x1="75" y1="114.5" x2="75" y2="120"/>
-                <line x1="78.5" y1="114" x2="79.5" y2="119"/>
-                <line x1="81" y1="113" x2="82.5" y2="118"/>
-              </g>
-
               <!-- legs -->
               <path d="M45 90 L42 145 L47 225"/>
               <path d="M55 90 L58 145 L53 225"/>
-              <!-- knees -->
               <circle class="landmark" cx="44" cy="135" r="1.8"/>
               <circle class="landmark" cx="56" cy="135" r="1.8"/>
-              <!-- tibia/fibula guides -->
-              <path class="guide" d="M44 135 L46 190"/>
-              <path class="guide" d="M42 135 L44 190"/>
-              <path class="guide" d="M56 135 L54 190"/>
-              <path class="guide" d="M58 135 L56 190"/>
-
-              <!-- ***** BIG FEET (≈5x visual) ***** -->
-              <ellipse cx="47" cy="222" rx="16" ry="6"/>
-              <ellipse cx="53" cy="222" rx="16" ry="6"/>
+              <!-- feet moderately enlarged (1.5x) -->
+              <ellipse cx="47" cy="220" rx="10" ry="4"/>
+              <ellipse cx="53" cy="220" rx="10" ry="4"/>
               <g class="guide">
-                <line x1="39" y1="224" x2="39" y2="228"/>
-                <line x1="41" y1="224" x2="41" y2="228"/>
-                <line x1="43" y1="224" x2="43" y2="228"/>
-                <line x1="45" y1="224" x2="45" y2="228"/>
-                <line x1="47" y1="224" x2="47" y2="228"/>
-                <line x1="49" y1="224" x2="49" y2="228"/>
-                <line x1="51" y1="224" x2="51" y2="228"/>
-                <line x1="53" y1="224" x2="53" y2="228"/>
-                <line x1="55" y1="224" x2="55" y2="228"/>
-                <line x1="57" y1="224" x2="57" y2="228"/>
+                <line x1="43" y1="222" x2="43" y2="225"/>
+                <line x1="45" y1="222" x2="45" y2="225"/>
+                <line x1="47" y1="222" x2="47" y2="225"/>
+                <line x1="49" y1="222" x2="49" y2="225"/>
+                <line x1="51" y1="222" x2="51" y2="225"/>
+                <line x1="53" y1="222" x2="53" y2="225"/>
+                <line x1="55" y1="222" x2="55" y2="225"/>
+                <line x1="57" y1="222" x2="57" y2="225"/>
               </g>
             </g>
             <g id="dots"></g>
@@ -161,174 +128,9 @@
       </section>
     </div>
 
-    <section class="mt-6 text-xs text-slate-400">
-      参考注意: 本ページは教育・学習用の簡略表示です。押圧にも使えるよう深さ目安のみを掲載しています。医療行為・診断は各国家資格の範囲で実施し、禁忌や既往がある場合は専門家にご相談ください。
-    </section>
-  </div>
-
 <script>
-// =========================
-// DATA (points + symptoms)
-// =========================
-const POINTS = [
-  {id:"GV20", nameJP:"百会", nameEN:"Baihui", meridian:"督脈", region:"頭頂部",
-   location:"両耳尖を結ぶ線の正中上、頭頂の陥凹（前髪際と後髪際を9等分し上から5/9）",
-   locationSimple:"頭のてっぺん。両耳の先端を結んだ線のまんなか。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>耳尖を結ぶ線と正中線の交点。</li><li>前後の髪際9等分の5/9付近のくぼみ。</li></ol>`,
-   indications:["頭痛","めまい","意識障害","脱肛・痔","気分安定"], depth:"0.3–0.5寸（浅）", notes:"陽経交会所。昇陽挙陥・安神。", src:"GV p.29–30"},
-  {id:"TE5", nameJP:"外関", nameEN:"Waiguan", meridian:"手少陽三焦経", region:"前腕背側",
-   location:"手関節背横紋の上2寸、橈尺骨間の溝中。",
-   locationSimple:"手首の甲側のシワから肘に向かって指3本ぶん上、2本の骨の間のくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>手首の甲の横ジワ→肘方向へ指3本。</li><li>橈尺骨の溝の中央。</li></ol>`,
-   indications:["頭痛・こめかみ","耳鳴り","悪寒発熱","頸肩こり"], depth:"0.5–1.0寸", notes:"絡穴・陽維脈。", src:"TE p.212–214"},
-  {id:"GB20", nameJP:"風池", nameEN:"Fengchi", meridian:"足少陽胆経", region:"後頸部",
-   location:"乳様突起と僧帽筋外縁の間の陥凹、後頭骨下縁。",
-   locationSimple:"耳のうしろの骨と首の太い筋のあいだのくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>乳様突起と僧帽筋外縁の間。</li><li>後頭骨下縁のくぼみ。</li></ol>`,
-   indications:["片頭痛","頸肩こり","めまい","眼精疲労","感冒初期"], depth:"0.5–1.0寸（斜刺注意）", notes:"頭頸部の要穴。", src:"GB p.224–225"},
-  {id:"LI4", nameJP:"合谷", nameEN:"Hegu", meridian:"手陽明大腸経", region:"手背",
-   location:"第1・2中手骨の間、中手骨底の遠位で第2中手骨橈側。",
-   locationSimple:"親指と人さし指の骨が交わるところのくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>親指と人さし指の付け根の山（虎口）。</li><li>山頂から少し人差し指側のくぼみ。</li></ol>`,
-   indications:["頭痛","顔面痛","歯痛","感冒初期","鎮痛・鎮静"], depth:"0.5–1.0寸（妊婦注意）", notes:"四総穴。", src:"LI p.62–63"},
-  {id:"LR3", nameJP:"太衝", nameEN:"Taichong", meridian:"足厥陰肝経", region:"足背",
-   location:"第1・2中足骨間後方の陥凹。",
-   locationSimple:"足の甲、親指と人さし指の骨のあいだを足首側へたどったくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>1-2趾間から甲を足首側へなで上げる。</li><li>骨の分かれ目の先の落ち込むくぼみ。</li></ol>`,
-   indications:["情緒不安","頭痛","月経痛","上熱下寒"], depth:"0.3–0.8寸", notes:"肝気鬱結の要穴。", src:"LR p.240–241"},
-  {id:"LI11", nameJP:"曲池", nameEN:"Quchi", meridian:"手陽明大腸経", region:"肘部",
-   location:"肘窩横紋外端、上腕骨外上顆前縁。",
-   locationSimple:"肘を曲げた時のシワの外はし。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>肘を90°、肘窩横紋の外端。</li><li>外上顆の前のくぼみ。</li></ol>`,
-   indications:["清熱","皮膚炎・蕁麻疹","肘痛"], depth:"0.5–1.5寸", notes:"清熱・皮膚。", src:"LI p.67"},
-  {id:"PC6", nameJP:"内関", nameEN:"Neiguan", meridian:"手厥陰心包経", region:"前腕掌側",
-   location:"手関節掌側横紋の上2寸、橈側手根屈筋腱と長掌筋腱の間。",
-   locationSimple:"手首の内側のシワから肘に向かって指3本、2本の腱の間。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>掌側横紋→指3本上。</li><li>長掌筋腱と橈側手根屈筋腱の間。</li></ol>`,
-   indications:["悪心・嘔吐","動悸","胸悶","自律神経"], depth:"0.5–1.0寸", notes:"乗り物酔い。", src:"PC p.203–204"},
-  {id:"SP10", nameJP:"血海", nameEN:"Xuehai", meridian:"足太陰脾経", region:"大腿内側",
-   location:"膝蓋骨内上縁の上2寸、内側広筋の隆起部。",
-   locationSimple:"膝のお皿の内側上端から指3本上、内ももの盛り上がり。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>膝蓋骨内上角→指3本上。</li><li>内側広筋の盛り上がり。</li></ol>`,
-   indications:["皮膚瘙痒","湿疹","月経不順"], depth:"0.8–1.2寸", notes:"血の海。", src:"SP p.112–113"},
-  {id:"GV16", nameJP:"風府", nameEN:"Fengfu", meridian:"督脈", region:"後頭部",
-   location:"後髪際の中央、うなじの陥凹。",
-   locationSimple:"うなじのまんなかのくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>後頭部の髪際中央の直下。</li><li>正中のくぼみ。</li></ol>`,
-   indications:["後頭部痛","めまい","精神緊張"], depth:"0.3–0.5寸（浅）", notes:"頭項の要穴。", src:"GV p.27"},
-  {id:"ST36", nameJP:"足三里", nameEN:"Zusanli", meridian:"足陽明胃経", region:"下腿前外側",
-   location:"犢鼻から下3寸、脛骨前稜外方一横指。",
-   locationSimple:"膝のお皿の外側下のくぼみから指4本下、すね骨の外側。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>犢鼻→四横指下。</li><li>脛骨前稜の外側一横指。</li></ol>`,
-   indications:["胃もたれ","全身疲労","免疫","下肢痛"], depth:"0.8–1.5寸", notes:"養生の要穴。", src:"ST p.97–99"},
-  {id:"SP6", nameJP:"三陰交", nameEN:"Sanyinjiao", meridian:"足太陰脾経", region:"下腿内側",
-   location:"内果尖から上3寸、脛骨後縁。",
-   locationSimple:"内くるぶしの一番高い所から指3本上、すね骨のうしろ側のキワ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>内果尖→指3本上。</li><li>脛骨後縁の骨際。</li></ol>`,
-   indications:["月経痛","冷え","不眠","むくみ"], depth:"0.5–1.0寸（妊婦注意）", notes:"脾・肝・腎の交会。", src:"SP p.110–111"},
-  {id:"CV6", nameJP:"気海", nameEN:"Qihai", meridian:"任脈", region:"下腹部",
-   location:"臍下1.5寸。",
-   locationSimple:"へその下、指1～2本分（約1.5寸）。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>へそから下へ指1.5本。</li><li>正中線上。</li></ol>`,
-   indications:["冷え","腹痛","疲労","泌尿生殖"], depth:"0.5–1.0寸", notes:"元気を養う。", src:"CV p.39–40"},
-  {id:"CV4", nameJP:"関元", nameEN:"Guanyuan", meridian:"任脈", region:"下腹部",
-   location:"臍下3寸。",
-   locationSimple:"へその下、指3本。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>へそから下へ指3本。</li><li>正中線上。</li></ol>`,
-   indications:["月経痛","泌尿器","冷え"], depth:"0.5–1.0寸", notes:"婦人科で多用。", src:"CV p.38"},
-  {id:"CV12", nameJP:"中脘", nameEN:"Zhongwan", meridian:"任脈", region:"上腹部",
-   location:"臍上4寸。",
-   locationSimple:"へそから上へ指4本。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>へそから指4本上。</li><li>正中の圧痛点。</li></ol>`,
-   indications:["胃もたれ","食欲不振","胃痛","げっぷ"], depth:"0.5–1.0寸", notes:"胃の募穴。", src:"CV p.42–43"},
-  {id:"BL2", nameJP:"攅竹", nameEN:"Cuanzhu", meridian:"足太陽膀胱経", region:"眉頭部",
-   location:"眉頭内側端のくぼみ。",
-   locationSimple:"眉毛の内側の端のくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>眉毛の内端の骨のくぼみ。</li></ol>`,
-   indications:["眼精疲労","頭痛","流涙"], depth:"0.3–0.5寸（浅）", notes:"眼周囲の要穴。", src:"BL p.145"},
-  {id:"LI20", nameJP:"迎香", nameEN:"Yingxiang", meridian:"手陽明大腸経", region:"鼻翼外側",
-   location:"鼻唇溝中、鼻翼外縁の中点。",
-   locationSimple:"小鼻の横のほうれい線の上。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>鼻翼外側のほうれい線上の中点。</li></ol>`,
-   indications:["鼻づまり","くしゃみ","嗅覚低下"], depth:"0.3–0.5寸（浅）", notes:"鼻症状の定番。", src:"LI p.73"},
-  {id:"HT7", nameJP:"神門", nameEN:"Shenmen", meridian:"手少陰心経", region:"手関節部",
-   location:"手関節横紋の尺側端、豆状骨の近くのくぼみ。",
-   locationSimple:"手首の横ジワの小指側の端のくぼみ。",
-   locationDetail:`<ol class="list-decimal ml-5 space-y-1"><li>手首の横ジワ、小指側端。</li><li>豆状骨の前のくぼみ。</li></ol>`,
-   indications:["不眠","不安","動悸"], depth:"0.3–0.5寸", notes:"安神の要穴。", src:"HT p.124"}
-];
-
-const SYMPTOMS = [
-  {label:"頭痛・片頭痛", ids:["GB20","TE5","LI4","GV20","LR3","GV16"]},
-  {label:"肩こり・首こり", ids:["GB20","TE5","LI4"]},
-  {label:"腰痛", ids:["BL23","BL25","GV3","GB20"]},
-  {label:"不眠", ids:["HT7","GV20","SP6","PC6"]},
-  {label:"ストレス・イライラ", ids:["LR3","PC6","GV20"]},
-  {label:"冷え（手足の冷え）", ids:["SP6","CV6","ST36"]},
-  {label:"月経痛・PMS", ids:["SP6","CV4","LR3"]},
-  {label:"消化不良・胃もたれ", ids:["CV12","ST36","PC6"]},
-  {label:"眼精疲労・かすみ目", ids:["GB20","BL2","LI4"]},
-  {label:"花粉症・鼻づまり", ids:["LI20","LI4","GB20"]}
-];
-
-// =========================
-// COORDS (with big hands/feet)
-// =========================
-const COORDS = {
-  front: {
-    GV20:[50,2], GB20:[45,8], GV16:[50,9],
-    LI4:[26,112], TE5:[27,103], PC6:[28,101], LI11:[32,50],
-    SP10:[45,120], LR3:[48,196], ST36:[47,156], SP6:[52,171],
-    CV6:[50,74], CV4:[50,76], CV12:[50,64], LI20:[52,22], BL2:[48,18], HT7:[24,112]
-  },
-  back: {
-    GB20:[55,8], GV16:[50,9], BL23:[46,72], BL25:[46,76], GV3:[50,78]
-  }
-};
-
-// =========================
-// RENDER LOGIC
-// =========================
-const fig = document.getElementById('figure');
-const toggleGuides = document.getElementById('toggleGuides');
-if (toggleGuides) toggleGuides.addEventListener('change', ()=> fig.classList.toggle('hide-guides', !toggleGuides.checked));
-
-const sel = document.getElementById('symptom');
-const meridianSel = document.getElementById('meridianFilter');
-const sideSel = document.getElementById('viewSide');
-const searchInput = document.getElementById('search');
-const list = document.getElementById('list');
-const dotsLayer = document.getElementById('dots');
-
-const byId = Object.fromEntries(POINTS.map(p=>[p.id,p]));
-
-function populateSymptoms(){ sel.innerHTML=''; SYMPTOMS.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.label;sel.appendChild(o);}); sel.value='0'; }
-function populateMeridians(){ meridianSel.innerHTML='<option value="">すべて</option>'; [...new Set(POINTS.map(p=>p.meridian))].sort().forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;meridianSel.appendChild(o);}); }
-
-function cardHTML(p){
-  return `
-    <div class="text-sm font-semibold flex items-center justify-between"><span>${p.nameJP} <span class="text-slate-500 text-xs">(${p.id})</span></span><span class="chip">${p.meridian}</span></div>
-    <div class="text-xs text-slate-500">${p.nameEN} / ${p.region}</div>
-    <div><span class="text-xs text-slate-500">場所（やさしい説明）</span><div class="text-sm">${p.locationSimple||p.location}</div></div>
-    <details class="mt-1" open><summary class="text-xs text-slate-500 cursor-pointer">詳しい取穴法（ステップ）</summary><div class="text-sm mt-1">${p.locationDetail||p.location}</div></details>
-    <div><span class="text-xs text-slate-500">穴性・適応</span><div class="text-sm flex flex-wrap gap-1">${p.indications.map(i=>`<span class='chip'>${i}</span>`).join(' ')}</div></div>
-    <div class="grid grid-cols-2 gap-2"><div><span class="text-xs text-slate-500">深さ（目安）</span><div class="text-sm">${p.depth||'—'}</div></div><div><span class="text-xs text-slate-500">備考</span><div class="text-sm">${p.notes||'—'}</div></div></div>
-    <div class="text-xs text-slate-500">出典: ${p.src||'—'}</div>`;
-}
-
-function currentIds(){ const s=SYMPTOMS[+sel.value||0]; const q=(searchInput.value||'').toLowerCase(); const mf=meridianSel.value; let ids=[...s.ids]; if(mf) ids=ids.filter(id=>byId[id]?.meridian===mf); if(q) ids=ids.filter(id=>{const p=byId[id]; return p.id.toLowerCase().includes(q)||p.nameJP.includes(q)||p.nameEN.toLowerCase().includes(q)||p.location.toLowerCase().includes(q)||p.indications.some(i=>i.toLowerCase().includes(q));}); return ids; }
-
-function highlightDot(id,on){ const side=sideSel.value; const c=COORDS[side][id]; const nodes=[...dotsLayer.querySelectorAll('circle')]; nodes.forEach(n=>{ if(Math.abs(+n.getAttribute('cx')-c?.[0])<0.2 && Math.abs(+n.getAttribute('cy')-c?.[1])<0.2){ n.classList.toggle('active',on);} }); }
-function highlightCard(id,on){ const el=[...list.children].find(e=>e.dataset.id===id); if(el){ el.classList.toggle('bg-slate-50',on);} }
-function scrollToCard(id){ const el=[...list.children].find(e=>e.dataset.id===id); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('bg-slate-100'); setTimeout(()=>el.classList.remove('bg-slate-100'),900);} }
-
-function render(){ const side=sideSel.value; const ids=currentIds(); list.innerHTML=''; ids.forEach(id=>{ const p=byId[id]; const card=document.createElement('div'); card.className='border rounded-xl p-3 hover:bg-slate-50'; card.dataset.id=id; card.innerHTML=cardHTML(p); card.addEventListener('mouseenter',()=>highlightDot(id,true)); card.addEventListener('mouseleave',()=>highlightDot(id,false)); list.appendChild(card); }); dotsLayer.innerHTML=''; ids.forEach(id=>{ const c=COORDS[side][id]; if(!c) return; const dot=document.createElementNS('http://www.w3.org/2000/svg','circle'); dot.setAttribute('cx',c[0]); dot.setAttribute('cy',c[1]); dot.setAttribute('class','dot'); dot.setAttribute('fill','currentColor'); dot.addEventListener('mouseenter',()=>highlightCard(id,true)); dot.addEventListener('mouseleave',()=>highlightCard(id,false)); dot.addEventListener('click',()=>scrollToCard(id)); dotsLayer.appendChild(dot); }); }
-
-[sel,meridianSel,sideSel].forEach(e=> e.addEventListener('change',render));
-searchInput.addEventListener('input',render);
-window.addEventListener('keydown',ev=>{ if(ev.key==='Escape'){ [...list.children].forEach(c=>c.classList.remove('bg-slate-50','bg-slate-100')); }});
-
-if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',()=>{populateSymptoms();populateMeridians();render();}); } else { populateSymptoms();populateMeridians();render(); }
+const COORDS={front:{GV20:[50,2],GB20:[45,8],GV16:[50,9],LI4:[26,110],TE5:[27,103],PC6:[28,101],LI11:[32,50],SP10:[45,120],LR3:[48,188],ST36:[47,152],SP6:[52,167],CV6:[50,74],CV4:[50,76],CV12:[50,64],LI20:[52,22],BL2:[48,18],HT7:[24,110]},back:{GB20:[55,8],GV16:[50,9],BL23:[46,72],BL25:[46,76],GV3:[50,78]}};
+const toggle=document.getElementById('toggleGuides');const fig=document.getElementById('figure');if(toggle){toggle.addEventListener('change',()=>{fig.classList.toggle('hide-guides',!toggle.checked);});}
 </script>
 </body>
 </html>
