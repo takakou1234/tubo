@@ -3,87 +3,64 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ツボマップ（症状別ハイライト）</title>
+<title>ツボマップ｜症状別表示＋ツボ解説</title>
 <style>
-  :root {
-    --accent: #0f766e;
-    --accent-2: #155e75;
-    --chip: #eef6f6;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background:#fafafa; color:#222;
-    font-family: "Noto Sans JP","Yu Gothic",sans-serif;
-  }
-  header { background:#444; color:#fff; padding:.9rem 1rem; font-weight:600; }
-  .wrap { max-width:1200px; margin:18px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; gap:16px; }
-  @media (max-width: 960px){ .wrap{ grid-template-columns: 1fr; } }
-  .panel {
-    background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:14px;
-    box-shadow:0 1px 4px rgba(0,0,0,.04);
-  }
-  .panel h2 { margin:.2rem 0 .8rem; font-size:1.05rem; }
-  .row { display:flex; gap:8px; align-items:center; }
-  select, input[type="search"] {
-    width:100%; padding:.6rem .7rem; border:1px solid #d7d7d7; border-radius:10px; background:#fff;
-    font-size:.95rem;
-  }
-  button {
-    padding:.55rem .8rem; border-radius:10px; border:1px solid var(--accent);
-    background:var(--accent); color:#fff; cursor:pointer; font-weight:600;
-  }
-  button.ghost { background:#fff; color:var(--accent); }
-  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-  .chip {
-    font-size:.9rem; padding:.35rem .55rem; border-radius:999px; background:var(--chip);
-    border:1px solid #d9efef; cursor:pointer; user-select:none;
-  }
-  .chip.active { background:#d1f3f1; border-color:#9fe0dc; }
-  .list { margin-top:10px; max-height:420px; overflow:auto; border-top:1px dashed #eee; padding-top:8px; }
-  .item { display:flex; align-items:center; gap:8px; padding:6px 2px; border-bottom:1px dashed #f1f1f1; }
-  .dot { width:10px; height:10px; border-radius:50%; background:#222; }
-  .item button { margin-left:auto; font-size:.85rem; padding:.35rem .55rem; }
-  .hint { color:#666; font-size:.85rem; margin-top:8px; }
-  .canvas { background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:10px; }
-  object { width:100%; height:auto; display:block; border-radius:10px; }
-  /* ハイライト効果（SVG要素に適用） */
-  ._ghost { opacity:.25; transition:opacity .2s ease; }
-  ._hit   { opacity:1 !important; filter: drop-shadow(0 0 2px rgba(15,118,110,.6)); }
+  :root { --accent:#0f766e; --lite:#eef6f6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fafafa;color:#222;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
+  header{background:#444;color:#fff;padding:.9rem 1rem;font-weight:600}
+  .wrap{max-width:1200px;margin:18px auto;padding:0 14px;display:grid;grid-template-columns:320px 1fr;gap:16px}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr}}
+  .panel{background:#fff;border:1px solid #e6e6e6;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .panel h2{margin:.2rem 0 .8rem;font-size:1.05rem}
+  .row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  select{flex:1;padding:.6rem .7rem;border:1px solid #d7d7d7;border-radius:10px;background:#fff;font-size:.95rem}
+  button{padding:.55rem .8rem;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+  button.ghost{background:#fff;color:var(--accent)}
+  .canvas{padding:10px}
+  object{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #e6e6e6;background:#fff}
+  /* SVG制御クラス */
+  ._acupoint-text._hide{opacity:0;pointer-events:none}
+  ._acupoint-dot._hide{opacity:0;pointer-events:none}
+  ._acupoint-dot._show{opacity:1;filter:drop-shadow(0 0 2px rgba(15,118,110,.6))}
+  /* 解説カード */
+  .notes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px;max-height:420px;overflow:auto;border-top:1px dashed #eee;padding-top:10px}
+  .note{border:1px solid #e9f0ef;background:#fff;border-radius:12px;padding:10px}
+  .note h3{margin:.1rem 0 .3rem;font-size:1rem;color:#0f4d4a}
+  .note p{margin:.2rem 0 .2rem;font-size:.92rem;color:#333;line-height:1.5}
+  .hint{color:#666;font-size:.85rem;margin-top:8px}
 </style>
 </head>
 <body>
-<header>ツボマップ（GitHub Pages｜症状別ハイライト）</header>
+<header>ツボマップ（症状で絞り込み & ツボ解説）</header>
 
 <div class="wrap">
-  <!-- 左：操作パネル -->
+  <!-- 左：操作と解説 -->
   <aside class="panel">
     <h2>症状から選ぶ</h2>
-    <div class="row" style="margin-bottom:8px;">
+    <div class="row">
       <select id="symSelect" aria-label="症状を選択">
         <option value="">— 症状を選択 —</option>
-        <option value="肩こり">肩こり</option>
-        <option value="頭痛">頭痛</option>
-        <option value="顎関節痛">顎関節痛</option>
-        <option value="鼻閉・花粉症">鼻閉・花粉症</option>
-        <option value="逆流性食道炎">逆流性食道炎</option>
-        <option value="PMS">PMS</option>
-        <option value="坐骨神経痛">坐骨神経痛</option>
-        <option value="足関節痛">足関節痛</option>
+        <option>肩こり</option>
+        <option>頭痛</option>
+        <option>顎関節痛</option>
+        <option>鼻閉・花粉症</option>
+        <option>逆流性食道炎</option>
+        <option>PMS</option>
+        <option>坐骨神経痛</option>
+        <option>足関節痛</option>
       </select>
       <button id="apply">表示</button>
       <button class="ghost" id="clear">解除</button>
     </div>
+    <div class="hint">選ぶと、該当するツボ<strong>だけ</strong>が図上に表示され、下に解説が出ます。</div>
 
-    <div class="chips" id="symChips"></div>
-
-    <h2 style="margin-top:16px;">ツボ一覧</h2>
-    <input id="filter" type="search" placeholder="ツボ名で絞り込み（例：合谷）" />
-    <div class="list" id="tsuboList"><!-- JSで生成 --></div>
-
-    <p class="hint">※ SVG内の「ツボ名テキスト」に最も近い黒点（circle）を自動で関連付けてハイライトします。</p>
+    <h2 style="margin-top:14px;">選択中のツボ解説</h2>
+    <div id="notes" class="notes"><div class="hint">症状を選ぶとここに表示されます。</div></div>
+    <p class="hint">※ 学習・デモ用の一般的な説明です。医療行為はクリニックでご相談ください。</p>
   </aside>
 
-  <!-- 右：SVGキャンバス -->
+  <!-- 右：SVG -->
   <main class="panel canvas">
     <object id="svgObj" type="image/svg+xml" data="tsubo_map_front_medical_web.svg" aria-label="ツボマップ"></object>
   </main>
@@ -91,7 +68,7 @@
 
 <script>
 /* =============================
-   1) 症状→推奨ツボの対応表（自由に調整可）
+   症状→推奨ツボ
    ============================= */
 const symptomMap = {
   "肩こり": ["肩井","風池","天柱","肩髃","曲池","合谷"],
@@ -104,171 +81,141 @@ const symptomMap = {
   "足関節痛": ["解谿","崑崙","太谿","丘墟","申脈"]
 };
 
-/* 補助：よく使う代表的なツボ（一覧生成用）。症状表のユニオンでもOK */
-const defaultTsuboOrder = Array.from(new Set(Object.values(symptomMap).flat()))
-  .concat(["手三里","列缺","外関","合谷門","血海","梁丘","豊隆","陽陵泉","三陰交","太溪","足三里"]); // 追い足し
-
 /* =============================
-   2) SVGロード後、ツボ名⇔黒点を自動対応付け
+   ツボ解説（簡潔版）
    ============================= */
-const svgObj = document.getElementById('svgObj');
-let svgDoc, tsuboByName = new Map(); // name -> element(circle or group)
-let allDots = []; // 対象点（見た目を薄く/戻す用）
+const tsuboInfo = {
+  "肩井": {loc:"肩の中央、僧帽筋の最も盛り上がる所。", eff:"肩こり・首肩の緊張、頭重感。", how:"指腹で90秒ほどやさしく圧をかけ、ゆっくり3回。"},
+  "風池": {loc:"後頭骨下、胸鎖乳突筋と僧帽筋の間のくぼみ。", eff:"頭痛・頚部のこわばり・眼精疲労。", how:"親指で後頭部に向かってやさしく押圧。"},
+  "天柱": {loc:"後頭部の髪の生え際、僧帽筋の外側。", eff:"首こり・後頭部痛。", how:"頭を前に倒して押しやすい角度で30秒×3。"},
+  "肩髃": {loc:"肩関節の前外側、腕を水平でくぼむ点。", eff:"肩関節周囲の痛み・可動域。", how:"円を描くようにほぐす。"},
+  "曲池": {loc:"肘を曲げてできるしわの外端。", eff:"肘痛・肩こり補助、自律神経調整。", how:"押圧または軽い回旋でほぐす。"},
+  "合谷": {loc:"手背の親指と人差指の骨が交わる所のくぼみ。", eff:"頭痛・歯痛・肩こり・鼻症状。", how:"心地よい圧で30〜60秒。妊娠後期は長圧を避ける。"},
+  "百会": {loc:"両耳尖を結んだ線の正中、頭頂部。", eff:"頭痛・めまい・不眠・自律神経。", how:"深呼吸しながら軽圧。"},
+  "印堂": {loc:"眉間中央。", eff:"鼻閉・頭痛・ストレス。", how:"やさしく点圧。"},
+  "太衝": {loc:"足背、第一・二中足骨間のくぼみ。", eff:"頭痛・PMS・ストレス。", how:"指腹で30秒×3。"},
+  "頰車": {loc:"下顎角の少し前、歯を噛みしめて盛り上がる点。", eff:"顎関節痛・食いしばり。", how:"噛筋を緩めるようにじんわり。"},
+  "下関": {loc:"頬骨弓の下、口を開閉して動くくぼみ。", eff:"顎関節痛・耳周りの違和感。", how:"口を軽く開けた状態で優しく。"},
+  "太渓": {loc:"内くるぶしとアキレス腱の間のくぼみ。", eff:"顎痛補助・腰痛・冷え。", how:"温め＋軽圧。"},
+  "迎香": {loc:"小鼻の両外側のくぼみ。", eff:"鼻閉・花粉症。", how:"呼気に合わせてやや上外に向けて軽圧。"},
+  "上星": {loc:"前髪の生え際正中から指1本分上。", eff:"鼻閉・頭重。", how:"正中に沿って軽圧。"},
+  "内関": {loc:"手首しわ中央から肘側へ指3本分、2本の腱の間。", eff:"逆流性食道炎・吐き気・動悸。", how:"やや持続的に押す。"},
+  "中脘": {loc:"臍と胸骨剣状突起の中点。", eff:"胃もたれ・逆流。", how:"食後すぐは避け、やさしく円揉。"},
+  "膻中": {loc:"左右乳頭を結ぶ線の正中。", eff:"胸のつかえ・自律神経。", how:"浅く広めに手掌で包む。"},
+  "足三里": {loc:"膝下外側、脛骨稜から指1本外・下へ3本。", eff:"胃腸・全身調整・足疲労。", how:"ほどよい痛気持ち圧で。"},
+  "三陰交": {loc:"内くるぶし上、脛骨内縁を指4本分。", eff:"PMS・冷え・むくみ。", how:"心地よく温め＋指圧。妊娠後期は長圧を避ける。"},
+  "関元": {loc:"臍下指3本。", eff:"下腹部の冷え・生理痛。", how:"カイロ等で温め＋軽圧。"},
+  "気海": {loc:"臍下指1.5本。", eff:"疲労・冷え。", how:"腹式呼吸と併用。"},
+  "環跳": {loc:"股関節外側、立位で体重をかけるとくぼむ点。", eff:"坐骨神経痛・股関節痛。", how:"お尻の筋膜リリースと併用。"},
+  "殷門": {loc:"大腿後面中央、坐骨結節と膝窩の中点。", eff:"坐骨神経痛。", how:"フォームローラー等で優しく。"},
+  "委中": {loc:"膝裏しわの中央。", eff:"腰背部痛・坐骨神経痛。", how:"膝を少し曲げ押圧。"},
+  "承山": {loc:"下腿後面、腓腹筋のV字下端。", eff:"ふくらはぎ張り・坐骨神経痛。", how:"つま先立ち→リリースと併用。"},
+  "承扶": {loc:"殿部、坐骨結節のすぐ下。", eff:"坐骨神経痛。", how:"長圧は避け、短時間で。"},
+  "陽陵泉": {loc:"腓骨頭の前下方のくぼみ。", eff:"膝外側痛・坐骨神経痛補助。", how:"外側ラインをほぐすように。"},
+  "解谿": {loc:"足首前面、伸筋腱の間のくぼみ。", eff:"足関節痛・捻挫後の違和感。", how:"可動域内で軽圧。"},
+  "崑崙": {loc:"外くるぶしとアキレス腱の間のくぼみ。", eff:"足関節痛・腰痛。", how:"短時間の指圧。"},
+  "丘墟": {loc:"外くるぶし前下方のくぼみ。", eff:"足関節の捻挫後ケア。", how:"軽い円揉。"},
+  "申脈": {loc:"外くるぶしの真下。", eff:"足首安定・背部のこわばり。", how:"骨に沿ってやさしく。"}
+};
 
+/* ====== 内部状態 ====== */
+const svgObj = document.getElementById('svgObj');
+const symSelect = document.getElementById('symSelect');
+const notesEl  = document.getElementById('notes');
+let svgDoc=null;
+let nameToDot = new Map();     // ツボ名 -> circle
+let nameToTexts = new Map();   // ツボ名 -> [text,text,...]
+
+/* ====== SVGロード後：ツボ名と黒点を自動対応付け ====== */
 svgObj.addEventListener('load', () => {
   svgDoc = svgObj.contentDocument;
   if (!svgDoc) return;
 
-  // すべての circle を候補に
   const circles = Array.from(svgDoc.querySelectorAll('circle'));
-  // すべての text（ツボラベル）を取得
-  const texts = Array.from(svgDoc.querySelectorAll('text'));
+  const texts   = Array.from(svgDoc.querySelectorAll('text'));
 
-  // text毎に最も近いcircleを関連付け
+  // textごとに最も近いcircleを割当て（ツボ名テキストのみ対象）
   texts.forEach(t => {
-    const name = (t.textContent || "").trim().replace(/\s+/g, "");
+    const name = (t.textContent || "").trim().replace(/\s+/g,"");
     if (!name) return;
-    const tb = t.getBBox();
-    const tx = tb.x + tb.width/2, ty = tb.y + tb.height/2;
 
-    let best = null, bestD = Infinity;
-    circles.forEach(c => {
-      const cx = parseFloat(c.getAttribute('cx') || '0');
-      const cy = parseFloat(c.getAttribute('cy') || '0');
-      const dx = cx - tx, dy = cy - ty;
-      const d2 = dx*dx + dy*dy;
-      if (d2 < bestD) { bestD = d2; best = c; }
+    // 位置
+    const b = t.getBBox();
+    const tx = b.x + b.width/2, ty = b.y + b.height/2;
+
+    let best=null, bestD=Infinity;
+    circles.forEach(c=>{
+      const cx = +c.getAttribute('cx')||0;
+      const cy = +c.getAttribute('cy')||0;
+      const d2=(cx-tx)*(cx-tx)+(cy-ty)*(cy-ty);
+      if(d2<bestD){bestD=d2;best=c;}
     });
-    if (best) {
-      best.classList.add('tsubo-dot');
-      best.setAttribute('data-name', name);
-      // 既に登録済みの同名はスキップ（最初の1点を代表）
-      if (!tsuboByName.has(name)) tsuboByName.set(name, best);
+    if(best){
+      best.classList.add('_acupoint-dot');
+      if(!nameToDot.has(name)) nameToDot.set(name,best);
+      // テキスト管理
+      if(!nameToTexts.has(name)) nameToTexts.set(name,[]);
+      nameToTexts.get(name).push(t);
+      t.classList.add('_acupoint-text');
     }
   });
 
-  allDots = Array.from(svgDoc.querySelectorAll('.tsubo-dot'));
-  buildListUI();
+  // 初期：全ツボ表示（＝非表示解除）
+  showOnly([]);
 });
 
-/* =============================
-   3) UI 構築（症状チップ＆ツボ一覧）
-   ============================= */
-const symChips = document.getElementById('symChips');
-const symSelect = document.getElementById('symSelect');
-const listEl = document.getElementById('tsuboList');
-const filter = document.getElementById('filter');
+/* ====== 表示制御：指定ツボ“だけ”表示 ====== */
+function showOnly(names){
+  if(!svgDoc) return;
+  const want = new Set(names);
 
-function buildListUI() {
-  // 症状チップ
-  symChips.innerHTML = "";
-  Object.keys(symptomMap).forEach(key => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.textContent = key;
-    chip.onclick = () => {
-      symSelect.value = key;
-      applySymptom();
-      toggleActiveChip(key);
-    };
-    symChips.appendChild(chip);
-  });
+  // 1) いったん全ツボを隠す（黒点と“ツボ名テキスト”のみ対象）
+  nameToDot.forEach(el => { el.classList.add('_hide'); el.classList.remove('_show'); });
+  nameToTexts.forEach(arr => arr.forEach(t => t.classList.add('_hide')));
 
-  renderTsuboList();
-}
-
-function renderTsuboList() {
-  const q = (filter.value || "").trim();
-  // tsuboByName ができるまで待つ（SVG未ロード時）
-  const names = tsuboByName.size ? Array.from(tsuboByName.keys()) : defaultTsuboOrder;
-  const list = names
-    .filter(n => !q || n.includes(q))
-    .sort((a,b) => a.localeCompare(b,"ja"));
-
-  listEl.innerHTML = "";
-  list.forEach(name => {
-    const row = document.createElement('div');
-    row.className = 'item';
-
-    const dot = document.createElement('span');
-    dot.className = 'dot';
-
-    const label = document.createElement('span');
-    label.textContent = name;
-
-    const btn = document.createElement('button');
-    btn.textContent = "ハイライト";
-    btn.onclick = () => highlightByNames([name], true);
-
-    row.appendChild(dot);
-    row.appendChild(label);
-    row.appendChild(btn);
-    listEl.appendChild(row);
+  // 2) 指定ツボだけ表示
+  want.forEach(n=>{
+    const dot = nameToDot.get(n);
+    if(dot){ dot.classList.remove('_hide'); dot.classList.add('_show'); }
+    const texts = nameToTexts.get(n)||[];
+    texts.forEach(t => t.classList.remove('_hide'));
   });
 }
 
-filter.addEventListener('input', renderTsuboList);
-
-/* =============================
-   4) ハイライト制御
-   ============================= */
-function clearHighlight() {
-  if (!svgDoc) return;
-  // 全体を薄く
-  const root = svgDoc.documentElement;
-  root.querySelectorAll("*").forEach(el => el.classList.remove('_ghost','_hit'));
-}
-
-function highlightByNames(names, scrollFirst=false) {
-  if (!svgDoc) return;
-  const root = svgDoc.documentElement;
-
-  // まず全体を薄く
-  root.querySelectorAll("*").forEach(el => el.classList.add('_ghost'));
-  // 対象点だけ強調
-  let firstEl = null;
-  names.forEach(name => {
-    const el = tsuboByName.get(name);
-    if (el) {
-      el.classList.add('_hit');
-      el.classList.remove('_ghost');
-      // ラベル(text) も強調（同名テキスト）
-      Array.from(svgDoc.querySelectorAll('text'))
-        .filter(t => (t.textContent || "").trim().replace(/\s+/g,"") === name)
-        .forEach(t => { t.classList.add('_hit'); t.classList.remove('_ghost'); });
-      if (!firstEl) firstEl = el;
-    }
-  });
-
-  // スクロール（モバイルでも見失いにくくする）
-  if (scrollFirst && firstEl) {
-    const vb = svgDoc.documentElement.viewBox.baseVal;
-    if (vb && vb.width) {
-      // 軽いフラッシュ
-      firstEl.style.transition = "transform .15s ease";
-      firstEl.style.transform = "scale(1.4)";
-      setTimeout(()=> firstEl.style.transform = "scale(1)", 250);
-    }
+/* ====== 解説生成 ====== */
+function renderNotes(names){
+  if(!names.length){
+    notesEl.innerHTML = '<div class="hint">症状を選ぶとここに表示されます。</div>';
+    return;
   }
+  notesEl.innerHTML = "";
+  names.forEach(n=>{
+    const info = tsuboInfo[n];
+    const card = document.createElement('div');
+    card.className = 'note';
+    const h = document.createElement('h3'); h.textContent = n;
+    const p1 = document.createElement('p'); p1.innerHTML = `<strong>位置：</strong>${info?.loc||"（調整中）"}`;
+    const p2 = document.createElement('p'); p2.innerHTML = `<strong>効能：</strong>${info?.eff||"（調整中）"}`;
+    const p3 = document.createElement('p'); p3.innerHTML = `<strong>押し方：</strong>${info?.how||"（調整中）"}`;
+    card.append(h,p1,p2,p3);
+    notesEl.appendChild(card);
+  });
 }
 
-/* 症状選択 */
-function applySymptom() {
+/* ====== イベント ====== */
+document.getElementById('apply').onclick = () => {
   const key = symSelect.value;
-  if (!key) return;
+  if(!key){ showOnly([]); renderNotes([]); return; }
   const names = symptomMap[key] || [];
-  highlightByNames(names, true);
-}
+  showOnly(names);
+  renderNotes(names);
+};
 
-function toggleActiveChip(key) {
-  Array.from(symChips.children).forEach(ch => ch.classList.toggle('active', ch.textContent === key));
-}
-
-/* ボタン */
-document.getElementById('apply').onclick = applySymptom;
-document.getElementById('clear').onclick = () => { symSelect.value=""; clearHighlight(); toggleActiveChip(""); };
-
-/* ページ初期：リストは絞り込みなしで表示 */
+document.getElementById('clear').onclick = () => {
+  symSelect.value = "";
+  showOnly([]);       // ＝全ツボ表示（隠す解除）
+  renderNotes([]);
+};
 </script>
 </body>
 </html>
