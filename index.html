@@ -68,59 +68,26 @@
           <div class="text-xs text-slate-500">点をクリックでカードをハイライト（<span class="kbd">Esc</span>で解除）</div>
         </div>
         <div class="mt-2 relative">
-          <svg id="figure" viewBox="0 0 100 230" class="w-full h-[640px] bg-slate-50 rounded-xl border">
+          <svg id="figure" viewBox="0 0 100 230" class="w-full h-[620px] bg-slate-50 rounded-xl border">
             <g id="silhouette" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.5">
               <circle cx="50" cy="18" r="10"/>
               <circle class="landmark" cx="40" cy="19" r="3"/>
               <circle class="landmark" cx="60" cy="19" r="3"/>
-              <circle class="landmark" cx="47" cy="16" r="1"/>
-              <circle class="landmark" cx="53" cy="16" r="1"/>
               <path d="M35 28 Q50 34 65 28 L65 90 Q50 96 35 90 Z"/>
               <circle class="landmark" cx="43" cy="45" r="1.4"/>
               <circle class="landmark" cx="57" cy="45" r="1.4"/>
               <circle class="landmark" cx="50" cy="78" r="1.4"/>
-              <!-- arms -->
               <path d="M35 32 L22 72"/>
               <path d="M65 32 L78 72"/>
-              <!-- forearms -->
-              <path class="guide" d="M22 72 L24.5 95"/>
-              <path class="guide" d="M25 72 L27.5 95"/>
-              <path class="guide" d="M78 72 L75.5 95"/>
-              <path class="guide" d="M75 72 L72.5 95"/>
-              <!-- moderately enlarged hands (1.5x) -->
-              <ellipse cx="25" cy="107" rx="8" ry="4.5"/>
-              <ellipse cx="75" cy="107" rx="8" ry="4.5"/>
-              <!-- finger lines -->
-              <g class="guide">
-                <line x1="21" y1="109" x2="20" y2="113"/>
-                <line x1="23" y1="109.5" x2="22.5" y2="113.5"/>
-                <line x1="25" y1="110" x2="25" y2="114"/>
-                <line x1="27" y1="109.5" x2="27.5" y2="113.5"/>
-                <line x1="29" y1="109" x2="30" y2="113"/>
-                <line x1="71" y1="109" x2="70" y2="113"/>
-                <line x1="73" y1="109.5" x2="72.5" y2="113.5"/>
-                <line x1="75" y1="110" x2="75" y2="114"/>
-                <line x1="77" y1="109.5" x2="77.5" y2="113.5"/>
-                <line x1="79" y1="109" x2="80" y2="113"/>
-              </g>
-              <!-- legs -->
+              <!-- smaller hands/feet -->
+              <ellipse cx="25" cy="107" rx="5" ry="3"/>
+              <ellipse cx="75" cy="107" rx="5" ry="3"/>
               <path d="M45 90 L42 145 L47 225"/>
               <path d="M55 90 L58 145 L53 225"/>
               <circle class="landmark" cx="44" cy="135" r="1.8"/>
               <circle class="landmark" cx="56" cy="135" r="1.8"/>
-              <!-- feet moderately enlarged (1.5x) -->
-              <ellipse cx="47" cy="220" rx="10" ry="4"/>
-              <ellipse cx="53" cy="220" rx="10" ry="4"/>
-              <g class="guide">
-                <line x1="43" y1="222" x2="43" y2="225"/>
-                <line x1="45" y1="222" x2="45" y2="225"/>
-                <line x1="47" y1="222" x2="47" y2="225"/>
-                <line x1="49" y1="222" x2="49" y2="225"/>
-                <line x1="51" y1="222" x2="51" y2="225"/>
-                <line x1="53" y1="222" x2="53" y2="225"/>
-                <line x1="55" y1="222" x2="55" y2="225"/>
-                <line x1="57" y1="222" x2="57" y2="225"/>
-              </g>
+              <ellipse cx="47" cy="220" rx="6" ry="3"/>
+              <ellipse cx="53" cy="220" rx="6" ry="3"/>
             </g>
             <g id="dots"></g>
           </svg>
@@ -129,8 +96,30 @@
     </div>
 
 <script>
-const COORDS={front:{GV20:[50,2],GB20:[45,8],GV16:[50,9],LI4:[26,110],TE5:[27,103],PC6:[28,101],LI11:[32,50],SP10:[45,120],LR3:[48,188],ST36:[47,152],SP6:[52,167],CV6:[50,74],CV4:[50,76],CV12:[50,64],LI20:[52,22],BL2:[48,18],HT7:[24,110]},back:{GB20:[55,8],GV16:[50,9],BL23:[46,72],BL25:[46,76],GV3:[50,78]}};
+const SYMPTOMS=[
+  {label:"頭痛・片頭痛",ids:["GB20","TE5","LI4","GV20","LR3","GV16"]},
+  {label:"肩こり・首こり",ids:["GB20","TE5","LI4"]},
+  {label:"腰痛",ids:["BL23","BL25","GV3","GB20"]},
+  {label:"不眠",ids:["HT7","GV20","SP6","PC6"]},
+  {label:"ストレス・イライラ",ids:["LR3","PC6","GV20"]},
+  {label:"冷え（手足の冷え）",ids:["SP6","CV6","ST36"]},
+  {label:"月経痛・PMS",ids:["SP6","CV4","LR3"]},
+  {label:"消化不良・胃もたれ",ids:["CV12","ST36","PC6"]},
+  {label:"眼精疲労・かすみ目",ids:["GB20","BL2","LI4"]},
+  {label:"花粉症・鼻づまり",ids:["LI20","LI4","GB20"]}
+];
+
+const COORDS={front:{GV20:[50,2],GB20:[45,8],GV16:[50,9],LI4:[26,108],TE5:[27,102],PC6:[28,100],LI11:[32,50],SP10:[45,120],LR3:[48,184],ST36:[47,148],SP6:[52,162],CV6:[50,74],CV4:[50,76],CV12:[50,64],LI20:[52,22],BL2:[48,18],HT7:[24,108]},back:{GB20:[55,8],GV16:[50,9],BL23:[46,72],BL25:[46,76],GV3:[50,78]}};
+
 const toggle=document.getElementById('toggleGuides');const fig=document.getElementById('figure');if(toggle){toggle.addEventListener('change',()=>{fig.classList.toggle('hide-guides',!toggle.checked);});}
+
+const sel=document.getElementById('symptom');
+SYMPTOMS.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.label;sel.appendChild(o);});
+sel.value='0';
+
+function render(){const side='front';const ids=SYMPTOMS[sel.value].ids;const dots=document.getElementById('dots');dots.innerHTML='';ids.forEach(id=>{const c=COORDS[side][id];if(!c)return;const d=document.createElementNS('http://www.w3.org/2000/svg','circle');d.setAttribute('cx',c[0]);d.setAttribute('cy',c[1]);d.setAttribute('r',4);d.setAttribute('fill','currentColor');dots.appendChild(d);});}
+sel.addEventListener('change',render);
+render();
 </script>
 </body>
 </html>
